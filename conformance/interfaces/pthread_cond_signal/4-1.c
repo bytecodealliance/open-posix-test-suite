@@ -16,7 +16,9 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <errno.h>
+#ifndef __wasi__
 #include <signal.h>
+#endif
 #include "posixtest.h"
 
 #define THREAD_NUM  5
@@ -32,17 +34,8 @@ pthread_t  thread[THREAD_NUM];
 int start_num = 0;
 int waken_num = 0;
 
-/* Alarm handler */
-void alarm_handler(int signo)
-{
-	int i;
-	printf("Error: failed to wakeup all threads\n");
-	for (i=0; i<THREAD_NUM; i++) {	/* cancel threads */
-	    	pthread_cancel(thread[i]); 
-	}
+// WASI-EDIT: removed alarm_handler
 
-	exit(PTS_UNRESOLVED);
-}
 void *thr_func(void *arg)
 {
 	int rc;
@@ -74,7 +67,9 @@ void *thr_func(void *arg)
 int main()
 {
 	int i, rc;
+	#ifndef __wasi__
 	struct sigaction act;
+	#endif
 
 	if (pthread_mutex_init(&td.mutex, NULL) != 0) {
 		fprintf(stderr,"Fail to initialize mutex\n");
@@ -94,12 +89,7 @@ int main()
 	while (start_num < THREAD_NUM)	/* waiting for all threads started */
 		usleep(100);
 
-	/* Setup alarm handler */
-	act.sa_handler=alarm_handler;
-	act.sa_flags=0;
-	sigemptyset(&act.sa_mask);
-	sigaction(SIGALRM, &act, 0);
-	alarm(5);
+	// WASI-EDIT: removed signal handler setup and alarm
 
 	while (waken_num < THREAD_NUM) { /* loop to wake up all waiter threads */
 		fprintf(stderr,"[Main thread] signals a condition\n");

@@ -29,9 +29,9 @@
 
 #define STACKADDROFFSET 0x8000000
 
-void *thread_func()
+// WASI-EDIT: corrected signature
+void *thread_func(void* arg)
 {
-	pthread_exit(0);
 	return NULL;
 }
 int main()

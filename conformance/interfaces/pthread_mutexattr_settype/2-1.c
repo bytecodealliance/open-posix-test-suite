@@ -27,17 +27,31 @@
 #include <pthread.h>
 #include <stdio.h>
 #include <errno.h>
+#ifndef __wasi__
 #include <signal.h>
+#endif
 #include <unistd.h>
 #include <stdlib.h>
 #include "posixtest.h"
 
+#ifndef __wasi__
 void alarm_handler(int signo)
 {
 	printf("Got SIGALRM after 1 second\n");
 	printf("Test PASSED\n");
 	exit(PTS_PASS);
 }
+#else
+/* WASI: Use a helper thread to detect deadlock instead of signals */
+void *timeout_thread(void *arg)
+{
+	sleep(1);
+	printf("Helper thread woke up after 1 second - main thread is deadlocked as expected\n");
+	printf("Test PASSED\n");
+	exit(PTS_PASS);
+	return NULL;
+}
+#endif
 
 int main()
 {
@@ -74,9 +88,19 @@ int main()
 		return PTS_UNRESOLVED;
 	}
 
+#ifndef __wasi__
 	signal(SIGALRM, alarm_handler);
 	alarm(1);
-	/* This lock will cause deadlock */
+#else
+	/* WASI: Create a helper thread to detect the deadlock */
+	pthread_t timeout_tid;
+	if(pthread_create(&timeout_tid, NULL, timeout_thread, NULL) != 0)
+	{
+		perror("Error creating timeout thread\n");
+		return PTS_UNRESOLVED;
+	}
+#endif
+	/* This lock will cause deadlock (will be interrupted by CTest timeout on WASI) */
 	ret=pthread_mutex_lock(&mutex);
 	/* We should not get here */
 	printf("Relock the mutex did not get deadlock\n");	

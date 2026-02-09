@@ -21,19 +21,39 @@
 #include <stdio.h>
 #include <errno.h>
 #include <unistd.h>
+#include <sched.h>
 #include "posixtest.h"
 
+#ifdef __wasi__
+static volatile int thread_started = 0;
+static volatile int thread_still_running = 0;
+#endif
 
+#ifdef __wasi__
+void *a_thread_func(void* arg)
+#else
 void *a_thread_func()
+#endif
 {
-	
+#ifndef __wasi__	
 	pthread_setcanceltype(PTHREAD_CANCEL_ASYNCHRONOUS, NULL);
 
 	/* If the thread wasn't canceled in 10 seconds, time out */
 	sleep(10);	
 
 	perror("Thread couldn't be canceled (at cleanup time), timing out\n");
-	pthread_exit(0);
+#else
+	/* On WASI, signal we started and keep running for a while */
+	thread_started = 1;
+	thread_still_running = 1;
+	
+	/* Yield several times to give main thread a chance to check */
+	for (int i = 0; i < 100; i++) {
+		sched_yield();
+	}
+	
+	thread_still_running = 0;
+#endif
 	return NULL;
 }
 
@@ -64,6 +84,13 @@ int main()
 		return PTS_UNRESOLVED;
 	}
 
+#ifdef __wasi__
+	/* Wait for thread to start */
+	while (!thread_started) {
+		sched_yield();
+	}
+#endif
+
 	/* Detach the thread. */
 	if(pthread_detach(new_th) != 0)
 	{
@@ -71,6 +98,24 @@ int main()
 		return PTS_FAIL;
 	}
 
+#ifdef __wasi__
+	/* Verify that it hasn't terminated the thread by checking our flag */	
+	/* Yield a few times to give thread a chance to run */
+	for (int i = 0; i < 10; i++) {
+		sched_yield();
+	}
+	
+	if(thread_still_running == 0)
+	{
+		printf("Test FAILED: Thread terminated after detach\n");
+		return PTS_FAIL;
+	}
+	
+	/* Wait for thread to finish naturally */
+	while (thread_still_running) {
+		sched_yield();
+	}
+#else
 	/* Verify that it hasn't terminated the thread */	
 	ret=pthread_cancel(new_th);
 
@@ -84,6 +129,7 @@ int main()
 		perror("Error canceling thread\n");
 		return PTS_UNRESOLVED;
 	}
+#endif
 
 	printf("Test PASSED\n");
 	return PTS_PASS;

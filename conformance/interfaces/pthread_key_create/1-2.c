@@ -31,16 +31,19 @@ pthread_key_t keys[NUM_OF_THREADS];
 int i;
 
 /* Thread function that sets the key to KEY_VALUE */
+#ifdef __wasi__
+void *a_thread_func(void* arg)
+#else
 void *a_thread_func()
+#endif
 {
 	/* Set the key to KEY_VALUE */
 	if(pthread_setspecific(keys[i], (void *)(KEY_VALUE)) != 0)
 	{
 		printf("Error: pthread_setspecific() failed\n");
-		pthread_exit((void*)PTS_FAIL);
+		return (void*) PTS_FAIL;
 	}
-
-	pthread_exit(0);
+	return NULL;
 }
 
 int main()

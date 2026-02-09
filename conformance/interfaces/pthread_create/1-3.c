@@ -69,7 +69,6 @@ void *a_thread_function()
 	while(1)
 		sleep(1);
 
-	pthread_exit(0);
 	return NULL;
 }
 

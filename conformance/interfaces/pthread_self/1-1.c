@@ -26,10 +26,13 @@
 pthread_t new_th2;	/* Global thread to hold the value of when pthread_self
 			   returns from the thread function. */
 
+#ifdef __wasi__
+void *a_thread_func(void* arg)
+#else
 void *a_thread_func()
+#endif
 {
 	new_th2=pthread_self();
-	pthread_exit(0);
 	return NULL;
 }
 

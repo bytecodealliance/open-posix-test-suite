@@ -26,7 +26,11 @@
 
 int main()
 {
+	#ifdef __wasi__
+	pthread_key_t key = 0;
+	#else
 	pthread_key_t key;
+	#endif
 	void* rc;
 
 	/* Verify that the value associated with "key" in a new thread is NULL */

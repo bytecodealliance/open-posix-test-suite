@@ -24,7 +24,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
+#ifndef __wasi__
 #include <signal.h>
+#endif
 #include <errno.h>
 #include <string.h>
 #include "posixtest.h"
@@ -40,7 +42,7 @@ static void* fn_chld(void *arg)
 { 
 	int rc = 0;
 
-	pthread_setcanceltype(PTHREAD_CANCEL_ASYNCHRONOUS, NULL);
+	// WASI-EDIT: removed pthread_setcanceltype
 
 	thread_state = ENTERED_THREAD;
 
@@ -58,29 +60,18 @@ static void* fn_chld(void *arg)
 	}
 	
 	thread_state = EXITING_THREAD;
-	pthread_exit(0);
 	return NULL;
 }
 
-void sig_handler()
-{
-	printf("Interrupted by SIGALRM\n");
-	printf("Test PASSED: main blocked on barrier init\n");
-	exit(PTS_PASS);
-}
+// WASI-EDIT: removed sig_handler
  
 int main()
 {
 	int cnt = 0;
 	int rc;
 	pthread_t child_thread;
-	struct sigaction act;	
 
-	/* Set up main thread to handle SIGALRM */
-	act.sa_flags = 0;
-	act.sa_handler = sig_handler;
-	sigfillset(&act.sa_mask);
-	sigaction(SIGALRM, &act, 0);
+	// WASI-EDIT: removed signal handling setup (not supported on wasip3)
 	
 	printf("main: Initialize barrier with count = 2\n");
 	if(pthread_barrier_init(&barrier, NULL, 2) != 0)
@@ -117,8 +108,7 @@ int main()
 		exit(PTS_UNRESOLVED);
 	}
 
-	/* Just in case main gets in a blocked state, send me a SIGALRM after 2 secs */
-	alarm(2);
+	// WASI-EDIT: removed alarm() call
 
 	printf("main: reinitilize barrier while thread is blocking on it\n");	
 	rc = pthread_barrier_init(&barrier, NULL, 2);
@@ -134,8 +124,20 @@ int main()
 		printf("Test PASSED: Note*: Expected EBUSY, but standard says 'may' fail.\n");
 	}
 
-	/* Cancel thread in case it is still blocked */
-	pthread_cancel(child_thread);	
+	/* WASI-EDIT: Unblock child thread properly instead of canceling */
+	printf("main: unblocking child thread by waiting on barrier\n");
+	rc = pthread_barrier_wait(&barrier);
+	if(rc != 0 && rc != PTHREAD_BARRIER_SERIAL_THREAD)
+	{
+		printf("Warning: pthread_barrier_wait() returned: %d, %s\n", rc, strerror(rc));
+	}
+	
+	/* Join the child thread */
+	if(pthread_join(child_thread, NULL) != 0)
+	{
+		printf("Error: pthread_join() failed\n");
+		return PTS_UNRESOLVED;
+	}
 	
 	return PTS_PASS;
 }

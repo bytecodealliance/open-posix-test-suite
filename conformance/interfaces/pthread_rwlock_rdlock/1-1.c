@@ -66,7 +66,6 @@ static void* fn_rd(void *arg)
 		exit(PTS_UNRESOLVED);
 	}
 	thread_state = EXITING_THREAD;
-	pthread_exit(0);
 	return NULL;
 }
  

@@ -53,7 +53,8 @@ void a_cleanup_func3(void *flag_val)
 }
 
 /* Function that the thread executes upon its creation */
-void *a_thread_func()
+// WASI-EDIT: corrected signature
+void *a_thread_func(void *arg)
 {
 	pthread_cleanup_push(a_cleanup_func1, NULL);
 	pthread_cleanup_push(a_cleanup_func2, NULL);
@@ -62,7 +63,6 @@ void *a_thread_func()
 	pthread_cleanup_pop(1);
 	pthread_cleanup_pop(1);
 
-	pthread_exit(0);
 	return NULL;
 }
 

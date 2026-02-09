@@ -23,16 +23,12 @@
 #include "posixtest.h"
 
 /* Thread function */
+#ifdef __wasi__
+void *a_thread_func(void* arg)
+#else
 void *a_thread_func()
+#endif
 {
-	
-	pthread_setcanceltype(PTHREAD_CANCEL_ASYNCHRONOUS, NULL);
-
-	/* If the thread wasn't canceled in 10 seconds, time out */
-	sleep(10);	
-
-	perror("Thread couldn't be canceled (at cleanup time), timing out\n");
-	pthread_exit(0);
 	return NULL;
 }
 
@@ -65,9 +61,6 @@ int main()
 
 	/* Detach the thread. */
 	ret=pthread_detach(new_th);
-
-	/* Cleanup and cancel the thread */	
-	pthread_cancel(new_th);
 
 	/* Check return value of pthread_detach() */
 	if(ret != 0)

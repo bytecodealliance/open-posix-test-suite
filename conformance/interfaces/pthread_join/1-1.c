@@ -24,7 +24,11 @@
 int end_exec;	/* Global flag indicating the the thread function has finished execution. */
 
 /* Thread's function. */
+#ifdef __wasi__
+void *a_thread_func(void* arg)
+#else
 void *a_thread_func()
+#endif
 {
 	int i;
 	
@@ -38,7 +42,6 @@ void *a_thread_func()
 	/* Indicate that the thread has ended execution. */
 	end_exec=1;
 	
-	pthread_exit(0);
 	return NULL;
 }
 

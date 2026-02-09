@@ -16,7 +16,9 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <stdio.h>
+#ifndef __wasi__
 #include <signal.h>
+#endif
 #include "posixtest.h"
 
 struct testdata
@@ -30,6 +32,7 @@ pthread_t  thread1;
 int t1_start = 0;
 int signaled = 0;
 
+#ifndef __wasi__
 /* Alarm handler */
 void alarm_handler(int signo)
 {
@@ -37,6 +40,7 @@ void alarm_handler(int signo)
 	pthread_cancel(thread1); 
 	exit(PTS_UNRESOLVED);
 }
+#endif
 
 void *t1_func(void *arg)
 {
@@ -68,7 +72,9 @@ void *t1_func(void *arg)
 
 int main()
 {
+#ifndef __wasi__
 	struct sigaction act;
+#endif
 
 	if (pthread_mutex_init(&td.mutex, NULL) != 0) {
 		fprintf(stderr,"Fail to initialize mutex\n");
@@ -97,12 +103,14 @@ int main()
 	}
 	sleep(2);
 	
+#ifndef __wasi__
 	/* Setup alarm handler */
 	act.sa_handler=alarm_handler;
 	act.sa_flags=0;
 	sigemptyset(&act.sa_mask);
 	sigaction(SIGALRM, &act, 0);
 	alarm(5);
+#endif
 
 	fprintf(stderr,"Time to wake up thread1 by signaling a condition\n");
 	signaled = 1;

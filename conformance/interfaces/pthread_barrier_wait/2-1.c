@@ -29,7 +29,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
-#include <signal.h>
+// WASI-EDIT: removed unused include
 #include "posixtest.h"
 
 #define THREAD_NUM 5 
@@ -62,7 +62,6 @@ static void* fn_chld(void *arg)
 		normal_rt++;
 	}
 	
-	pthread_exit(0);
 	return NULL;
 }
  

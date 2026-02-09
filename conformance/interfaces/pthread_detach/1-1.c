@@ -26,15 +26,24 @@
 #include "posixtest.h"
 
 
+#ifdef __wasi__
+void *a_thread_func(void* arg)
+#else
 void *a_thread_func()
+#endif
 {
+#ifndef __wasi__
 	pthread_setcanceltype(PTHREAD_CANCEL_ASYNCHRONOUS, NULL);
 
 	/* If the thread wasn't canceled in 10 seconds, time out */
 	sleep(10);	
 
 	perror("Thread couldn't be canceled (at cleanup time), timing out\n");
-	pthread_exit(0);
+#else
+	/* On WASI, just run briefly since we can't use pthread_cancel.
+	 * The test will verify detach/join behavior before thread exits. */
+	sleep(1);
+#endif
 	return NULL;
 }
 
@@ -75,8 +84,10 @@ int main()
 	/* Now try and join it.  This should fail. */
 	ret=pthread_join(new_th, NULL);
 	
+#ifndef __wasi__
 	/* Cleanup: Cancel the thread */
 	pthread_cancel(new_th);
+#endif
 	
 	if(ret == 0)
 	{

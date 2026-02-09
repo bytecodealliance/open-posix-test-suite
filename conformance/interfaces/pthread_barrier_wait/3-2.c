@@ -78,7 +78,6 @@ static void* fn_chld(void *arg)
 		printf("thread: got PTHREAD_BARRIER_SERIAL_THREAD\n");
 	
 	thread_state = EXITING_THREAD;
-	pthread_exit(0);
 	return NULL;
 }
 

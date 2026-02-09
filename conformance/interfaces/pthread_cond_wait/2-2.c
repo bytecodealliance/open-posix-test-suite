@@ -52,7 +52,12 @@
  #include <unistd.h>
 
  #include <errno.h>
+ #ifndef __wasi__
  #include <sys/wait.h>
+ #endif
+ #ifdef __wasi__
+ #define _WASI_EMULATED_MMAN
+ #endif
  #include <sys/mman.h>
  #include <string.h>
  
@@ -289,6 +294,7 @@ int main(int argc, char * argv[])
 	}
 	else
 	{
+		#ifndef __wasi__
 		/* We will place the test data in a mmaped file */
 		char filename[] = "/tmp/cond_wait_2-2-XXXXXX";
 		size_t sz;
@@ -330,6 +336,7 @@ int main(int argc, char * argv[])
 		/* Our datatest structure is now in shared memory */
 		#if VERBOSE > 1
 		output("Testdata allocated in shared memory.\n");
+		#endif
 		#endif
 	}
 	
@@ -438,10 +445,10 @@ int main(int argc, char * argv[])
 /**********
  * Proceed to the actual testing 
  */
-		
 		/* Create the child */
 		if (do_fork != 0)
 		{
+		#ifndef __wasi__
 			/* We are testing across two processes */
 			child_pr = fork();
 			if (child_pr == -1)
@@ -464,6 +471,7 @@ int main(int argc, char * argv[])
 				}
 			}
 			/* Only the parent process goes further */
+		#endif
 		}
 		else /* do_fork == 0 */
 		{
@@ -518,6 +526,7 @@ int main(int argc, char * argv[])
 		/* Wait for the child to terminate */
 		if (do_fork != 0)
 		{
+		#ifndef __wasi__
 			/* We were testing across two processes */
 			chkpid = waitpid(child_pr, &status, 0);
 			if (chkpid != child_pr)
@@ -544,6 +553,7 @@ int main(int argc, char * argv[])
 			{
 				exit(ret); /* Output has already been closed in child */
 			}
+		#endif
 		}
 		else /* child was a thread */
 		{

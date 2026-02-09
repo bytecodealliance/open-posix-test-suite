@@ -31,7 +31,11 @@ int sem1;		/* Manual semaphore */
 int cancel_flag;
 
 /* Function that the thread executes upon its creation */
+#ifdef __wasi__
+void *a_thread_func(void* arg)
+#else
 void *a_thread_func()
+#endif
 {
 	/* Set cancel state to DISABLE, meaning it shouldn't honor any cancel requests. */
 	pthread_setcancelstate(PTHREAD_CANCEL_DISABLE, NULL);
@@ -54,7 +58,6 @@ void *a_thread_func()
 	/* Should reach here if the thread correctly ignores the cancel
 	 * request. */
 	cancel_flag=1;
-	pthread_exit(0);
 	return NULL;
 }
 

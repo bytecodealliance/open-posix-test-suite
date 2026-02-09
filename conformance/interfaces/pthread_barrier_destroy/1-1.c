@@ -20,7 +20,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
-#include <signal.h>
+// WASI-EDIT: removed unused include
 #include <string.h>
 #include "posixtest.h"
 

@@ -17,38 +17,27 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
-#include <signal.h>
+// WASI-EDIT: removed unused include
 #include <errno.h>
 #include <string.h>
 #include "posixtest.h"
 
 int rc;
 
-void sig_handler()
-{
-	printf("main: blocked on barrier wait with an un-initializied barrier object.\n");
-	printf("Test PASSED: Note*: Expected EINVAL when calling this funtion with an un-initialized barrier object, but standard says 'may' fail.\n");
-	exit(PTS_PASS);
-}
+// WASI-EDIT: removed sig_handler
 
 int main()
 {
 	pthread_barrier_t barrier;
-	struct sigaction act;	
 
-	/* Set up main thread to handle SIGALRM */
-	act.sa_flags = 0;
-	act.sa_handler = sig_handler;
-	sigfillset(&act.sa_mask);
-	sigaction(SIGALRM, &act, 0);
+	// WASI-EDIT: removed signal handling setup
 
 	/* Intialize return code */
 	rc = 1;	
 	
 	/* Call pthread_barrier_wait while refering to an un-initialized barrier object */
 	
-	/* Just in case we are blocked, send a SIGALRM after 2 sec. */
-	alarm(2);
+	// WASI-EDIT: removed alarm() call
 	
 	rc = pthread_barrier_wait(&barrier);
 	

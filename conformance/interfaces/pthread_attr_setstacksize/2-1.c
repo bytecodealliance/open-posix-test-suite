@@ -36,7 +36,7 @@
 
 size_t stack_size;
 
-void *thread_func()
+void *thread_func(void* arg)
 {
 	pthread_attr_t attr;
 	size_t ssize;
@@ -57,7 +57,6 @@ void *thread_func()
 		exit(PTS_FAIL);
 	}	
 
-	pthread_exit(0);
 	return NULL;
 }
 

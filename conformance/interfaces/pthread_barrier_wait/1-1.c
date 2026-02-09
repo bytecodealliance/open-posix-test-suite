@@ -23,7 +23,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
-#include <signal.h>
+// WASI-EDIT: removed unused include
 #include <string.h>
 #include "posixtest.h"
 
@@ -52,29 +52,18 @@ static void* fn_chld(void *arg)
 	} 
 	
 	thread_state = EXITING_THREAD;
-	pthread_exit(0);
 	return NULL;
 }
 
-void sig_handler()
-{
-	printf("Interrupted by SIGALRM\n");
-	printf("Test FAILED: main blocked on barrier wait\n");
-	exit(PTS_FAIL);
-}
+// WASI-EDIT: removed sig_handler
  
 int main()
 {
 	int cnt = 0;
 	int rc;
 	pthread_t child_thread;
-	struct sigaction act;	
 
-	/* Set up main thread to handle SIGALRM */
-	act.sa_flags = 0;
-	act.sa_handler = sig_handler;
-	sigfillset(&act.sa_mask);
-	sigaction(SIGALRM, &act, 0);
+	// WASI-EDIT: removed signal handling setup
 	
 	printf("Initialize barrier with count = 2\n");
 	if(pthread_barrier_init(&barrier, NULL, 2) != 0)
@@ -112,8 +101,7 @@ int main()
 
 	printf("main: call barrier wait\n");
 	
-	/* we should not block here, but just in case we do */
-	alarm(2);
+	// WASI-EDIT: removed alarm() call
 
 	rc = pthread_barrier_wait(&barrier);
 	

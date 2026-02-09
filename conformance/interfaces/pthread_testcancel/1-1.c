@@ -52,7 +52,11 @@ void a_cleanup_func()
 }
 
 /* Function that the thread executes upon its creation */
+#ifdef __wasi__
+void *a_thread_func(void* arg)
+#else
 void *a_thread_func()
+#endif
 {
 	pthread_setcancelstate(PTHREAD_CANCEL_ENABLE, NULL);
 	pthread_setcanceltype(PTHREAD_CANCEL_DEFERRED, NULL);
@@ -67,7 +71,6 @@ void *a_thread_func()
 	if(pthread_mutex_lock(&mutex) != 0)
         {
 		perror("Error in pthread_mutex_lock()\n");
-		pthread_exit((void*)PTS_UNRESOLVED);
 		return (void*)PTS_UNRESOLVED;
 	}
 
@@ -81,7 +84,6 @@ void *a_thread_func()
 	/* Should not get here if the cancel request was honored at the cancelation point
 	 * pthread_testcancel(). */
 	cleanup_flag=-2;
-	pthread_exit(0);
 	return NULL;
 }
 

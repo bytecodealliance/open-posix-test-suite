@@ -60,7 +60,6 @@ void *a_thread_func()
 	/* Indicate that the thread start routine was reached.  If it was reached, the test
 	 * fails, as the thread should have not been created in the first place. */
 	created_thread = 1;
-	pthread_exit(0);
 	return NULL;
 }
 
@@ -76,17 +75,15 @@ void sig_handler(int sig)
 		if(created_thread == 1)
 		{
 			printf("Test FAILED: Created thread though an invalid attribute was passed to pthread_create().\n");
-			pthread_exit((void*)PTS_FAIL);
+			return PTS_FAIL;
 		}
 
 		printf("Test PASSED\n");
-		pthread_exit((void*)PTS_PASS);
 		return;
 	}
 
 	printf("Test FAILED: Did not receive segmentation fault signal, waited 10 seconds.\n");
-	pthread_exit((void*)PTS_FAIL);
-	return;
+	return PTS_FAIL;
 }
 
 /* MAIN */

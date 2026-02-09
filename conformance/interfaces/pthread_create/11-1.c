@@ -22,7 +22,11 @@
 #include <time.h>
 #include "posixtest.h"
 
+#ifdef __wasi__
+void *a_thread_func(void* arg)
+#else
 void *a_thread_func()
+#endif
 {
 	clockid_t cpuclock;
 	struct timespec ts = {.tv_sec = 1, .tv_nsec = 1};
@@ -31,11 +35,11 @@ void *a_thread_func()
 	/* Just test the tv_sec field here. */
 	if (ts.tv_sec != 0)
 	{
-		printf("ts.tv_sec: %ld, ts.tv_nsec: %ld\n", 
+		// WASI-EDIT: ts.tvsec is int64_t in wasi-libc
+		printf("ts.tv_sec: %lld, ts.tv_nsec: %ld\n", 
 			ts.tv_sec, ts.tv_nsec);
 		exit(PTS_FAIL);
 	}
-	pthread_exit(0);
 	return NULL;
 }
 

@@ -34,21 +34,23 @@ pthread_key_t key;
 void* rc1;
 void* rc2;
 
+#ifdef __wasi__
+void *a_thread_func(void* arg)
+#else
 void *a_thread_func()
+#endif
 {
 	/* Bind a value to key for this thread (this will be different from the value
 	 * that we bind for the main thread) */
 	if(pthread_setspecific(key, (void *)(KEY_VALUE_2)) != 0)
 	{
 		printf("Test FAILED: Could not set the value of the key to %d\n", (KEY_VALUE_2));
-		pthread_exit((void*)PTS_FAIL);
 		return NULL;
 	}
 
 	/* Get the bound value of the key that we just set. */
 	rc2 = pthread_getspecific(key);
 
-	pthread_exit(0);
 	return NULL;
 
 }

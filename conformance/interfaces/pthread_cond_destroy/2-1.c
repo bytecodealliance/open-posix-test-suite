@@ -47,11 +47,15 @@
  #include <unistd.h>
 
  #include <errno.h>
+ #ifndef __wasi__
  #include <signal.h>
+ #endif
  #include <string.h>
  #include <time.h>
+ #ifndef __wasi__
  #include <sys/mman.h>
  #include <sys/wait.h>
+ #endif
  
 /********************************************************************************************/
 /******************************   Test framework   *****************************************/
@@ -75,24 +79,9 @@
   * 
   * Those may be used to output information.
   */
-#define UNRESOLVED_KILLALL(error, text, Tchild) { \
-	if (td->fork) \
-	{ \
-		int _nch; \
-		for (_nch=0; _nch<NTHREADS; _nch++) \
-			kill(Tchild[_nch], SIGKILL); \
-	} \
-	UNRESOLVED(error, text); \
-	}
-#define FAILED_KILLALL(text, Tchild) { \
-	if (td->fork) \
-	{ \
-		int _nch; \
-		for (_nch=0; _nch<NTHREADS; _nch++) \
-			kill(Tchild[_nch], SIGKILL); \
-	} \
-	FAILED(text); \
-	}
+// WASI-EDIT: Removed kill-based cleanup
+#define UNRESOLVED_KILLALL(error, text, Tchild) UNRESOLVED(error, text)
+#define FAILED_KILLALL(text, Tchild) FAILED(text)
 /********************************************************************************************/
 /********************************** Configuration ******************************************/
 /********************************************************************************************/
@@ -130,6 +119,7 @@ struct _scenar
 	int fork; /* 0: Test between threads. ~ !0: Test across processes, if supported (mmap) */
 	char * descr; /* Case description */
 }
+// WASI-EDIT: Removed process-shared and fork scenarios
 scenarii[] =
 {
 	 {PTHREAD_MUTEX_DEFAULT,    0, 0, 0, "Default mutex"}
@@ -137,31 +127,11 @@ scenarii[] =
 	,{PTHREAD_MUTEX_ERRORCHECK, 0, 0, 0, "Errorcheck mutex"}
 	,{PTHREAD_MUTEX_RECURSIVE,  0, 0, 0, "Recursive mutex"}
 
-	,{PTHREAD_MUTEX_DEFAULT,    1, 0, 0, "PShared default mutex"}
-	,{PTHREAD_MUTEX_NORMAL,     1, 0, 0, "Pshared normal mutex"}
-	,{PTHREAD_MUTEX_ERRORCHECK, 1, 0, 0, "Pshared errorcheck mutex"}
-	,{PTHREAD_MUTEX_RECURSIVE,  1, 0, 0, "Pshared recursive mutex"}
-
-	,{PTHREAD_MUTEX_DEFAULT,    1, 0, 1, "Pshared default mutex across processes"}
-	,{PTHREAD_MUTEX_NORMAL,     1, 0, 1, "Pshared normal mutex across processes"}
-	,{PTHREAD_MUTEX_ERRORCHECK, 1, 0, 1, "Pshared errorcheck mutex across processes"}
-	,{PTHREAD_MUTEX_RECURSIVE,  1, 0, 1, "Pshared recursive mutex across processes"}
-
 #ifdef USE_ALTCLK
-	,{PTHREAD_MUTEX_DEFAULT,    1, 1, 1, "Pshared default mutex and alt clock condvar across processes"}
-	,{PTHREAD_MUTEX_NORMAL,     1, 1, 1, "Pshared normal mutex and alt clock condvar across processes"}
-	,{PTHREAD_MUTEX_ERRORCHECK, 1, 1, 1, "Pshared errorcheck mutex and alt clock condvar across processes"}
-	,{PTHREAD_MUTEX_RECURSIVE,  1, 1, 1, "Pshared recursive mutex and alt clock condvar across processes"}
-
 	,{PTHREAD_MUTEX_DEFAULT,    0, 1, 0, "Default mutex and alt clock condvar"}
 	,{PTHREAD_MUTEX_NORMAL,     0, 1, 0, "Normal mutex and alt clock condvar"}
 	,{PTHREAD_MUTEX_ERRORCHECK, 0, 1, 0, "Errorcheck mutex and alt clock condvar"}
 	,{PTHREAD_MUTEX_RECURSIVE,  0, 1, 0, "Recursive mutex and alt clock condvar"}
-
-	,{PTHREAD_MUTEX_DEFAULT,    1, 1, 0, "PShared default mutex and alt clock condvar"}
-	,{PTHREAD_MUTEX_NORMAL,     1, 1, 0, "Pshared normal mutex and alt clock condvar"}
-	,{PTHREAD_MUTEX_ERRORCHECK, 1, 1, 0, "Pshared errorcheck mutex and alt clock condvar"}
-	,{PTHREAD_MUTEX_RECURSIVE,  1, 1, 0, "Pshared recursive mutex and alt clock condvar"}
 #endif
 };
 #define NSCENAR (sizeof(scenarii)/sizeof(scenarii[0]))
@@ -343,6 +313,7 @@ int main (int argc, char * argv[])
 	}
 	else
 	{
+	#ifndef __wasi__
 		/* We will place the test data in a mmaped file */
 		char filename[] = "/tmp/cond_destroy-XXXXXX";
 		size_t sz, ps;
@@ -386,6 +357,7 @@ int main (int argc, char * argv[])
 		#if VERBOSE > 1
 		output("Testdata allocated in shared memory (%ib).\n", sizeof(testdata_t));
 		#endif
+	#endif
 	}
 	
 	/* Do the test for each test scenario */
@@ -467,6 +439,7 @@ int main (int argc, char * argv[])
 			}
 			else
 			{
+			#ifndef __wasi__
 				p_child[ch]=fork();
 				if (p_child[ch] == -1)
 				{
@@ -481,6 +454,7 @@ int main (int argc, char * argv[])
 					child(NULL);
 					exit(0);
 				}
+			#endif
 			}
 		}
 		#if VERBOSE > 4
@@ -605,6 +579,7 @@ int main (int argc, char * argv[])
 			}
 			else
 			{
+			#ifndef __wasi__
 				pid = waitpid(p_child[ch], &status, 0);
 				if (pid != p_child[ch])
 				{
@@ -622,6 +597,7 @@ int main (int argc, char * argv[])
 					if (ret != PTS_FAIL)
 						ret |= WEXITSTATUS(status);
 				}
+			#endif
 			}
 		}
 		if (ret != 0)

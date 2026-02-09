@@ -41,18 +41,22 @@ void dest_func(void *p)
 }
 
 /* Thread function */
+#ifdef __wasi__
+void *a_thread_func(void* arg)
+#else
 void *a_thread_func()
+#endif
 {
 
 	/* Set the value of the key to a value */	
 	if(pthread_setspecific(key, (void *)(KEY_VALUE)) != 0)
 	{
 		printf("Error: pthread_setspecific() failed\n");
-		pthread_exit((void*) PTS_UNRESOLVED);
+		return (void*)PTS_UNRESOLVED;
 	}
 	
 	/* The thread ends here, the destructor for the key should now be called after this */
-	pthread_exit(0);
+	return NULL;
 }
 
 int main()
@@ -66,7 +70,7 @@ int main()
 	if(pthread_key_create(&key, dest_func) != 0)
 	{
 		printf("Error: pthread_key_create() failed\n");
-		pthread_exit((void*) PTS_UNRESOLVED);
+		return PTS_UNRESOLVED;
 	}
 
 	/* Create a thread */

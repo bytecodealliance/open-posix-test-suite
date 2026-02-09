@@ -43,13 +43,18 @@ int main()
 		exit(PTS_UNRESOLVED);
 	}
 	
+	// WASI-EDIT: this relies on unspecified behavior, the spec says:
+	// If the pthread_attr_getstack() function is called before the stackaddr attribute has been set, the behavior is unspecified.
+	#ifndef __wasi__ 
 	/* Get the default stack_addr and stack_size value */	
 	rc = pthread_attr_getstack(&attr, &stack_addr, &stack_size); 	
+	printf("stack_addr = %p, stack_size = %zu\n", stack_addr, stack_size);
 	if( rc != 0) {
+		printf("pthread_attr_getstack failed: %d\n", rc);
 		perror(ERROR_PREFIX "pthread_attr_getstack");
 		exit(PTS_UNRESOLVED);
 	}
-	printf("stack_addr = %p, stack_size = %zu\n", stack_addr, stack_size);
+	#endif
 
 	stack_size = PTHREAD_STACK_MIN;
 

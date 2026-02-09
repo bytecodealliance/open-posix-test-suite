@@ -48,6 +48,8 @@
  #include <signal.h>
  #include <string.h>
  #include <time.h>
+ // WASI-EDIT: we won't actually use mmap, but we need the definitions
+ #define _WASI_EMULATED_MMAN
  #include <sys/mman.h>
  #include <sys/wait.h>
  

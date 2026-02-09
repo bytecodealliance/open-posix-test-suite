@@ -16,7 +16,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
-#include <signal.h>
+// WASI-EDIT: removed unused include
 #include "posixtest.h"
 
 #define THREAD_NUM  3
@@ -32,17 +32,7 @@ pthread_t  thread[THREAD_NUM];
 int start_num = 0;
 int waken_num = 0;
 
-/* Alarm handler */
-void alarm_handler(int signo)
-{
-	int i;
-	printf("Error: failed to wakeup all threads\n");
-	for (i=0; i<THREAD_NUM; i++) {	/* cancel threads */
-	    	pthread_cancel(thread[i]); 
-	}
-
-	exit(PTS_UNRESOLVED);
-}
+// WASI-EDIT: removed alarm_handler
 
 void *thr_func(void *arg)
 {
@@ -76,7 +66,7 @@ void *thr_func(void *arg)
 int main()
 {
 	int i, rc;
-	struct sigaction act;
+	// WASI-EDIT: removed sigaction
 
 	if (pthread_mutex_init(&td.mutex, NULL) != 0) {
 		fprintf(stderr,"Fail to initialize mutex\n");
@@ -118,20 +108,12 @@ int main()
 	if (waken_num <= 0){
 		fprintf(stderr,"[Main thread] but no waiters were wakened\n");
                 printf("Test FAILED\n");
-		/* Cancel the threads */
-		for (i=0; i<THREAD_NUM; i++) {	/* cancel threads */
-	    		pthread_cancel(thread[i]); 
-		}
+		// WASI-EDIT: removed pthread_cancel calls
                 exit(PTS_FAIL);
 	}	
 	fprintf(stderr,"[Main thread] %d waiters were wakened\n", waken_num);
 
-	/* Setup alarm handler */
-	act.sa_handler=alarm_handler;
-	act.sa_flags=0;
-	sigemptyset(&act.sa_mask);
-	sigaction(SIGALRM, &act, 0);
-	alarm(5);
+	// WASI-EDIT: removed signal handler setup and alarm
 
 	/* loop to wake up the rest threads */
 	i=0;

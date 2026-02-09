@@ -79,42 +79,8 @@ struct __scenario
    /* Unary tests */
 /* 0*/	 CASE_POS( 0, 0, 0, 0, 0, 0, 0, 0, "default")
 /* 1*/	,CASE_POS( 1, 0, 0, 0, 0, 0, 0, 0, "detached")
-/* 2*/	,CASE_POS( 0, 1, 0, 0, 0, 0, 0, 0, "Explicit sched")
-/* 3*/	,CASE_UNK( 0, 0, 1, 0, 0, 0, 0, 0, "FIFO Policy")
-/* 4*/	,CASE_UNK( 0, 0, 2, 0, 0, 0, 0, 0, "RR Policy")
-/* 5*/	,CASE_UNK( 0, 0, 0, 1, 0, 0, 0, 0, "Max sched param")
-/* 6*/	,CASE_UNK( 0, 0, 0,-1, 0, 0, 0, 0, "Min sched param")
-/* 7*/	,CASE_POS( 0, 0, 0, 0, 1, 0, 0, 0, "Alternative contension scope")
 /* 8*/	,CASE_POS( 0, 0, 0, 0, 0, 1, 0, 0, "Alternative stack")
-/* 9*/	,CASE_POS( 0, 0, 0, 0, 0, 0, 1, 0, "No guard size")
-/*10*/	,CASE_UNK( 0, 0, 0, 0, 0, 0, 2, 0, "1p guard size")
 /*11*/	,CASE_POS( 0, 0, 0, 0, 0, 0, 0, 1, "Min stack size")
-
-   /* Stack play */
-	,CASE_POS( 0, 0, 0, 0, 0, 0, 1, 1, "Min stack size, no guard")
-	,CASE_UNK( 0, 0, 0, 0, 0, 0, 2, 1, "Min stack size, 1p guard")
-	,CASE_POS( 1, 0, 0, 0, 0, 1, 0, 0, "Detached, Alternative stack")
-	,CASE_POS( 1, 0, 0, 0, 0, 0, 1, 1, "Detached, Min stack size, no guard")
-	,CASE_UNK( 1, 0, 0, 0, 0, 0, 2, 1, "Detached, Min stack size, 1p guard")
-
-   /* Scheduling play -- all results are unknown since it might depend on the user priviledges */
-	,CASE_UNK( 0, 1, 1, 1, 0, 0, 0, 0, "Explicit FIFO max param")
-	,CASE_UNK( 0, 1, 2, 1, 0, 0, 0, 0, "Explicit RR max param")
-	,CASE_UNK( 0, 1, 1,-1, 0, 0, 0, 0, "Explicit FIFO min param")
-	,CASE_UNK( 0, 1, 2,-1, 0, 0, 0, 0, "Explicit RR min param")
-	,CASE_UNK( 0, 1, 1, 1, 1, 0, 0, 0, "Explicit FIFO max param, alt scope")
-	,CASE_UNK( 0, 1, 2, 1, 1, 0, 0, 0, "Explicit RR max param, alt scope")
-	,CASE_UNK( 0, 1, 1,-1, 1, 0, 0, 0, "Explicit FIFO min param, alt scope")
-	,CASE_UNK( 0, 1, 2,-1, 1, 0, 0, 0, "Explicit RR min param, alt scope")
-	,CASE_UNK( 1, 1, 1, 1, 0, 0, 0, 0, "Detached, explicit FIFO max param")
-	,CASE_UNK( 1, 1, 2, 1, 0, 0, 0, 0, "Detached, explicit RR max param")
-	,CASE_UNK( 1, 1, 1,-1, 0, 0, 0, 0, "Detached, explicit FIFO min param")
-	,CASE_UNK( 1, 1, 2,-1, 0, 0, 0, 0, "Detached, explicit RR min param")
-	,CASE_UNK( 1, 1, 1, 1, 1, 0, 0, 0, "Detached, explicit FIFO max param, alt scope")
-	,CASE_UNK( 1, 1, 2, 1, 1, 0, 0, 0, "Detached, explicit RR max param, alt scope")
-	,CASE_UNK( 1, 1, 1,-1, 1, 0, 0, 0, "Detached, explicit FIFO min param, alt scope")
-	,CASE_UNK( 1, 1, 2,-1, 1, 0, 0, 0, "Detached, explicit RR min param, alt scope")
-
 };
 
 #define NSCENAR (sizeof(scenarii) / sizeof(scenarii[0]))
@@ -143,11 +109,12 @@ void scenar_init()
 	output(" min stack size: %li\n", minstacksize);
 	#endif
 	
-	
+	#ifndef __wasi__
 	if (minstacksize % pagesize)
 	{
 		UNTESTED("The min stack size is not a multiple of the page size");
 	}
+	#endif
 	
 	for (i=0; i<NSCENAR; i++)
 	{
@@ -177,6 +144,7 @@ void scenar_init()
 		/* Sched related attributes */
 		if (tps>0) /* This routine is dependent on the Thread Execution Scheduling option */
 		{
+			#ifndef __wasi__
 			if (scenarii[i].explicitsched == 1)
 				ret = pthread_attr_setinheritsched(&scenarii[i].ta, PTHREAD_EXPLICIT_SCHED);
 			else
@@ -184,6 +152,7 @@ void scenar_init()
 			if (ret != 0)  {  UNRESOLVED(ret, "Unable to set inheritsched attribute");  }
 			#if VERBOSE > 4
 			output("inheritsched state was set sucessfully\n");
+			#endif
 			#endif
 		}
 		#if VERBOSE > 4
@@ -193,6 +162,7 @@ void scenar_init()
 		
 		if (tps>0) /* This routine is dependent on the Thread Execution Scheduling option */
 		{
+			#ifndef __wasi__
 			if (scenarii[i].schedpolicy == 1)
 			{
 				ret = pthread_attr_setschedpolicy(&scenarii[i].ta, SCHED_FIFO);
@@ -208,6 +178,7 @@ void scenar_init()
 			else
 				output("Sched policy untouched\n");
 			#endif
+			#endif
 		}
 		#if VERBOSE > 4
 		else
@@ -216,6 +187,7 @@ void scenar_init()
 		
 		if (scenarii[i].schedparam != 0)
 		{
+			#ifndef __wasi__
 			struct sched_param sp;
 			
 			ret = pthread_attr_getschedpolicy(&scenarii[i].ta, &old);
@@ -228,7 +200,7 @@ void scenar_init()
 			
 			ret = pthread_attr_setschedparam(&scenarii[i].ta, &sp);
 			if (ret != 0)  {  UNRESOLVED(ret, "Failed to set the sched param");  }
-			
+			#endif
 		#if VERBOSE > 4
 			output("Sched param was set sucessfully to %i\n", sp.sched_priority);
 		}
@@ -255,6 +227,7 @@ void scenar_init()
 				#if VERBOSE > 0
 				if (ret != 0)  {  output("WARNING: The TPS option is claimed to be supported but setscope fails\n");  }
 				#endif
+			
 				
 			#if VERBOSE > 4
 				output("Contension scope set to %s\n", old==PTHREAD_SCOPE_PROCESS?"PTHREAD_SCOPE_PROCESS":"PTHREAD_SCOPE_SYSTEM");

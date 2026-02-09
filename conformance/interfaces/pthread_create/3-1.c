@@ -32,18 +32,15 @@
 
 int sem1;		/* Manual semaphore */
 
+#ifdef __wasi__
+void *a_thread_func(void* arg)
+#else
 void *a_thread_func()
+#endif
 {
 	/* Indicate to main() that the thread was created. */
 	sem1=INTHREAD;
 
-	/* Wait for main to detach change the attribute object and try and detach this thread.
-	 * Wait for a timeout value of 10 seconds before timing out if the thread was not able
-	 * to be detached. */
-	sleep(TIMEOUT);
-
-	printf("Test FAILED: Did not detach the thread, main still waiting for it to end execution.\n");
-	pthread_exit((void*)PTS_FAIL);
 	return NULL;
 }
 

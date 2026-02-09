@@ -48,8 +48,10 @@
  #include <unistd.h>
 
  #include <errno.h>
+ #ifndef __wasi__
  #include <sys/wait.h>
  #include <sys/mman.h>
+ #endif
  #include <string.h>
  
 /********************************************************************************************/
@@ -107,6 +109,7 @@ scenarii[] =
 	,{PTHREAD_MUTEX_RECURSIVE,  0, 0, "Recursive mutex"}
 #endif
 
+#ifndef __wasi__
 	,{PTHREAD_MUTEX_DEFAULT,    1, 0, "Pshared mutex"}
 #ifndef WITHOUT_XOPEN
 	,{PTHREAD_MUTEX_NORMAL,     1, 0, "Pshared Normal mutex"}
@@ -119,6 +122,7 @@ scenarii[] =
 	,{PTHREAD_MUTEX_NORMAL,     1, 1, "Pshared Normal mutex across processes"}
 	,{PTHREAD_MUTEX_ERRORCHECK, 1, 1, "Pshared Errorcheck mutex across processes"}
 	,{PTHREAD_MUTEX_RECURSIVE,  1, 1, "Pshared Recursive mutex across processes"}
+#endif
 #endif
 };
 #define NSCENAR (sizeof(scenarii)/sizeof(scenarii[0]))
@@ -195,6 +199,7 @@ int main(int argc, char * argv[])
 		#endif
 	}
 	#ifndef WITHOUT_XOPEN
+	#ifndef __wasi__
 	else
 	{
 		/* We will place the test data in a mmaped file */
@@ -240,6 +245,7 @@ int main(int argc, char * argv[])
 		output("Testdata allocated in shared memory.\n");
 		#endif
 	}
+	#endif
 	#endif
 	
 /**********
@@ -328,6 +334,7 @@ int main(int argc, char * argv[])
 		/* Create the children */
 		if (do_fork != 0)
 		{
+		#ifndef __wasi__
 			/* We are testing across processes */
 			child_pr = fork();
 			if (child_pr == -1)
@@ -350,6 +357,7 @@ int main(int argc, char * argv[])
 				}
 			}
 			/* Only the parent process goes further */
+		#endif
 		}
 		else /* do_fork == 0 */
 		{
@@ -361,6 +369,7 @@ int main(int argc, char * argv[])
 		/* Wait for the child to terminate */
 		if (do_fork != 0)
 		{
+		#ifndef __wasi__
 			/* We were testing across processes */
 			ret = 0;
 			chkpid = waitpid(child_pr, &status, 0);
@@ -388,7 +397,7 @@ int main(int argc, char * argv[])
 			{
 				exit(ret); /* Output has already been closed in child */
 			}
-	
+		#endif
 		}
 		else /* child was a thread */
 		{

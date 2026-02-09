@@ -89,7 +89,7 @@ void *func(void *parm)
 
 	if((rc=pthread_mutex_lock(&mutex))!=0) {
 		fprintf(stderr,"Error at pthread_mutex_lock(), rc=%d\n",rc);
-		pthread_exit((void*)PTS_UNRESOLVED);
+		return (void*)PTS_UNRESOLVED;
 	}
 	t1_start=1;
 	
@@ -98,9 +98,8 @@ void *func(void *parm)
 
 	if((rc=pthread_mutex_unlock(&mutex))!=0) {
 		fprintf(stderr,"Error at pthread_mutex_unlock(), rc=%d\n",rc);
-		pthread_exit((void*)PTS_UNRESOLVED);
+		return (void*)PTS_UNRESOLVED;
 	}
 
-  	pthread_exit(0);
   	return (void*)(0);
 }
