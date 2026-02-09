@@ -29,7 +29,7 @@
 
 #define STACKADDROFFSET 0x8000000
 
-// WASI-EDIT: corrected signature
+
 void *thread_func(void* arg)
 {
 	return NULL;

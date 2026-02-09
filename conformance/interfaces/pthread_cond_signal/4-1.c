@@ -34,7 +34,7 @@ pthread_t  thread[THREAD_NUM];
 int start_num = 0;
 int waken_num = 0;
 
-// WASI-EDIT: removed alarm_handler
+
 
 void *thr_func(void *arg)
 {
@@ -89,7 +89,7 @@ int main()
 	while (start_num < THREAD_NUM)	/* waiting for all threads started */
 		usleep(100);
 
-	// WASI-EDIT: removed signal handler setup and alarm
+	
 
 	while (waken_num < THREAD_NUM) { /* loop to wake up all waiter threads */
 		fprintf(stderr,"[Main thread] signals a condition\n");

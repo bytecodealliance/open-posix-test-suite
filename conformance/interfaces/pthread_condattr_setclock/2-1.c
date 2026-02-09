@@ -27,7 +27,7 @@
 #include <errno.h>
 #include "posixtest.h"
 
-// WASI-EDIT: clockid_t is a pointer type in wasi-libc
+
 #define INVALID_CLOCKID NULL
 
 int main()

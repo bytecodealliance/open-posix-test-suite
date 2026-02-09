@@ -16,7 +16,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
-// WASI-EDIT: removed unused include
+
 #include "posixtest.h"
 
 #define THREAD_NUM  3
@@ -32,7 +32,7 @@ pthread_t  thread[THREAD_NUM];
 int start_num = 0;
 int waken_num = 0;
 
-// WASI-EDIT: removed alarm_handler
+
 
 void *thr_func(void *arg)
 {
@@ -66,7 +66,7 @@ void *thr_func(void *arg)
 int main()
 {
 	int i, rc;
-	// WASI-EDIT: removed sigaction
+	
 
 	if (pthread_mutex_init(&td.mutex, NULL) != 0) {
 		fprintf(stderr,"Fail to initialize mutex\n");
@@ -108,12 +108,12 @@ int main()
 	if (waken_num <= 0){
 		fprintf(stderr,"[Main thread] but no waiters were wakened\n");
                 printf("Test FAILED\n");
-		// WASI-EDIT: removed pthread_cancel calls
+		
                 exit(PTS_FAIL);
 	}	
 	fprintf(stderr,"[Main thread] %d waiters were wakened\n", waken_num);
 
-	// WASI-EDIT: removed signal handler setup and alarm
+	
 
 	/* loop to wake up the rest threads */
 	i=0;

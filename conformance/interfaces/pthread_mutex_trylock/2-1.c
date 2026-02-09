@@ -51,10 +51,6 @@
  #include <unistd.h>
 
  #include <errno.h>
- #ifndef __wasi__
- #include <sys/wait.h>
- #include <sys/mman.h>
- #endif
  #include <string.h>
  
 /********************************************************************************************/

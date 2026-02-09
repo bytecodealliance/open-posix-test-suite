@@ -109,13 +109,6 @@ void scenar_init()
 	output(" min stack size: %li\n", minstacksize);
 	#endif
 	
-	#ifndef __wasi__
-	if (minstacksize % pagesize)
-	{
-		UNTESTED("The min stack size is not a multiple of the page size");
-	}
-	#endif
-	
 	for (i=0; i<NSCENAR; i++)
 	{
 		#if VERBOSE > 2
@@ -144,7 +137,6 @@ void scenar_init()
 		/* Sched related attributes */
 		if (tps>0) /* This routine is dependent on the Thread Execution Scheduling option */
 		{
-			#ifndef __wasi__
 			if (scenarii[i].explicitsched == 1)
 				ret = pthread_attr_setinheritsched(&scenarii[i].ta, PTHREAD_EXPLICIT_SCHED);
 			else
@@ -152,7 +144,6 @@ void scenar_init()
 			if (ret != 0)  {  UNRESOLVED(ret, "Unable to set inheritsched attribute");  }
 			#if VERBOSE > 4
 			output("inheritsched state was set sucessfully\n");
-			#endif
 			#endif
 		}
 		#if VERBOSE > 4
@@ -162,23 +153,7 @@ void scenar_init()
 		
 		if (tps>0) /* This routine is dependent on the Thread Execution Scheduling option */
 		{
-			#ifndef __wasi__
-			if (scenarii[i].schedpolicy == 1)
-			{
-				ret = pthread_attr_setschedpolicy(&scenarii[i].ta, SCHED_FIFO);
-			}
-			if (scenarii[i].schedpolicy == 2)
-			{
-				ret = pthread_attr_setschedpolicy(&scenarii[i].ta, SCHED_RR);
-			}
-			if (ret != 0)  {  UNRESOLVED(ret, "Unable to set the sched policy");  }
-			#if VERBOSE > 4
-			if (scenarii[i].schedpolicy)
-				output("Sched policy was set sucessfully\n");
-			else
-				output("Sched policy untouched\n");
-			#endif
-			#endif
+			UNRESOLVED(0, "Test unsupported");
 		}
 		#if VERBOSE > 4
 		else
@@ -187,20 +162,7 @@ void scenar_init()
 		
 		if (scenarii[i].schedparam != 0)
 		{
-			#ifndef __wasi__
-			struct sched_param sp;
-			
-			ret = pthread_attr_getschedpolicy(&scenarii[i].ta, &old);
-			if (ret != 0)  {  UNRESOLVED(ret, "Unable to get sched policy from attribute"); }
-			
-			if (scenarii[i].schedparam == 1)
-				sp.sched_priority = sched_get_priority_max(old);
-			if (scenarii[i].schedparam == -1)
-				sp.sched_priority = sched_get_priority_min(old);
-			
-			ret = pthread_attr_setschedparam(&scenarii[i].ta, &sp);
-			if (ret != 0)  {  UNRESOLVED(ret, "Failed to set the sched param");  }
-			#endif
+			UNRESOLVED(0, "Test unsupported");
 		#if VERBOSE > 4
 			output("Sched param was set sucessfully to %i\n", sp.sched_priority);
 		}

@@ -43,7 +43,7 @@ int main()
 		exit(PTS_UNRESOLVED);
 	}
 	
-	// WASI-EDIT: this relies on unspecified behavior, the spec says:
+	
 	// If the pthread_attr_getstack() function is called before the stackaddr attribute has been set, the behavior is unspecified.
 	#ifndef __wasi__ 
 	/* Get the default stack_addr and stack_size value */	

@@ -21,7 +21,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
-// WASI-EDIT: removed unused include
+
 #include <errno.h>
 #include <string.h>
 #include "posixtest.h"

@@ -16,7 +16,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
-// WASI-EDIT: Removed #include <signal.h> (no signal support)
+
 #include "posixtest.h"
 
 struct testdata
@@ -30,7 +30,7 @@ pthread_t  thread1;
 int t1_start = 0;
 int signaled = 0;
 
-// WASI-EDIT: Removed alarm_handler function 
+
 
 void *t1_func(void *arg)
 {
@@ -74,7 +74,7 @@ void *t1_func(void *arg)
 
 int main()
 {
-	// WASI-EDIT: Removed struct sigaction 
+	
 
 	if (pthread_mutex_init(&td.mutex, NULL) != 0) {
 		fprintf(stderr,"Fail to initialize mutex\n");
@@ -103,7 +103,7 @@ int main()
 	}
 	sleep(1);
 	
-	// WASI-EDIT: Removed alarm handler setup (no signal support, rely on CTest timeout)
+	
 
 	fprintf(stderr,"Time to wake up thread1 by signaling a condition\n");
 	signaled = 1;

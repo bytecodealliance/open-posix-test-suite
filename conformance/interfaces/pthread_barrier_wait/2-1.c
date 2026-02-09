@@ -29,7 +29,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
-// WASI-EDIT: removed unused include
+
 #include "posixtest.h"
 
 #define THREAD_NUM 5 

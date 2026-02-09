@@ -34,11 +34,7 @@ pthread_key_t key;
 void* rc1;
 void* rc2;
 
-#ifdef __wasi__
 void *a_thread_func(void* arg)
-#else
-void *a_thread_func()
-#endif
 {
 	/* Bind a value to key for this thread (this will be different from the value
 	 * that we bind for the main thread) */

@@ -17,7 +17,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
-// WASI-EDIT: removed unused include
+
 #include "posixtest.h"
 
 #define THREAD_NUM  3
@@ -33,7 +33,7 @@ pthread_t  thread[THREAD_NUM];
 int start_num = 0;
 int waken_num = 0;
 
-// WASI-EDIT: removed alarm_handler
+
 
 void *thr_func(void *arg)
 {
@@ -80,7 +80,7 @@ void *thr_func(void *arg)
 int main()
 {
 	int i;
-	// WASI-EDIT: removed unused 'struct sigaction act;'
+	
 	pthread_mutexattr_t ma;
 	
 	if (pthread_mutexattr_init(&ma) != 0) {
@@ -112,7 +112,7 @@ int main()
 
 	sleep(1);
 	
-	// WASI-EDIT: removed signal handler setup and alarm
+	
 
 	while (waken_num < THREAD_NUM) { /* waiting for all threads wakened */
 		fprintf(stderr,"[Main thread] signals a condition\n");

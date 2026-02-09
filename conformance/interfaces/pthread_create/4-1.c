@@ -21,11 +21,7 @@
 #include <stdio.h>
 #include "posixtest.h"
 
-#ifdef __wasi__
 void *a_thread_func(void* arg);
-#else
-void *a_thread_func();
-#endif
 
 pthread_t self_th; 	/* Save the value of the function call pthread_self() 
 			   within the thread.  Keeping it global so 'main' can 
@@ -63,11 +59,7 @@ int main()
 }
 
 /* The thread function that calls pthread_self() to obtain its thread ID */
-#ifdef __wasi__
 void *a_thread_func(void* arg)
-#else
-void *a_thread_func()
-#endif
 {
 	self_th=pthread_self();
 	return NULL;

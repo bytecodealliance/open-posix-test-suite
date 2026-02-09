@@ -24,9 +24,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
-#ifndef __wasi__
-#include <signal.h>
-#endif
 #include <errno.h>
 #include <string.h>
 #include "posixtest.h"
@@ -42,7 +39,7 @@ static void* fn_chld(void *arg)
 { 
 	int rc = 0;
 
-	// WASI-EDIT: removed pthread_setcanceltype
+	
 
 	thread_state = ENTERED_THREAD;
 
@@ -63,7 +60,7 @@ static void* fn_chld(void *arg)
 	return NULL;
 }
 
-// WASI-EDIT: removed sig_handler
+
  
 int main()
 {
@@ -71,7 +68,7 @@ int main()
 	int rc;
 	pthread_t child_thread;
 
-	// WASI-EDIT: removed signal handling setup (not supported on wasip3)
+	
 	
 	printf("main: Initialize barrier with count = 2\n");
 	if(pthread_barrier_init(&barrier, NULL, 2) != 0)
@@ -108,7 +105,7 @@ int main()
 		exit(PTS_UNRESOLVED);
 	}
 
-	// WASI-EDIT: removed alarm() call
+	
 
 	printf("main: reinitilize barrier while thread is blocking on it\n");	
 	rc = pthread_barrier_init(&barrier, NULL, 2);

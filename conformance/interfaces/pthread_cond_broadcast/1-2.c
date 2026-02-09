@@ -79,7 +79,7 @@
   * 
   * Those may be used to output information.
   */
-// WASI-EDIT: Removed UNRESOLVED_KILLALL and FAILED_KILLALL macros
+
 /********************************************************************************************/
 /********************************** Configuration ******************************************/
 /********************************************************************************************/
@@ -118,7 +118,7 @@ struct _scenar
 	int c_clock; /* 0: cond uses the default clock. ~ !0: Cond uses monotonic clock, if supported. */
 	int fork; /* 0: Test between threads. ~ !0: Test across processes, if supported (mmap) */
 	char * descr; /* Case description */
-}// WASI-EDIT: Removed process-shared and fork scenarios (not supported in wasip3)
+}
 scenarii[] =
 {
 	 {PTHREAD_MUTEX_DEFAULT,    0, 0, 0, "Default mutex"}

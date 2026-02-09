@@ -23,7 +23,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
-// WASI-EDIT: removed unused include
+
 #include <string.h>
 #include "posixtest.h"
 
@@ -55,7 +55,7 @@ static void* fn_chld(void *arg)
 	return NULL;
 }
 
-// WASI-EDIT: removed sig_handler
+
  
 int main()
 {
@@ -63,7 +63,7 @@ int main()
 	int rc;
 	pthread_t child_thread;
 
-	// WASI-EDIT: removed signal handling setup
+	
 	
 	printf("Initialize barrier with count = 2\n");
 	if(pthread_barrier_init(&barrier, NULL, 2) != 0)
@@ -101,7 +101,7 @@ int main()
 
 	printf("main: call barrier wait\n");
 	
-	// WASI-EDIT: removed alarm() call
+	
 
 	rc = pthread_barrier_wait(&barrier);
 	

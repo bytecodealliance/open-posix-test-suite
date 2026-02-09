@@ -20,11 +20,7 @@
 #include "posixtest.h"
 
 /* Thread starting routine that really does nothing. */
-#ifdef __wasi__
 void *a_thread_func(void* arg)
-#else
-void *a_thread_func()
-#endif
 {
 	return NULL;
 }

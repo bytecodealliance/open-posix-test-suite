@@ -28,11 +28,7 @@
 #include "posixtest.h"
 
 /* Thread function */
-#ifdef __wasi__
 void *a_thread_func(void* arg)
-#else
-void *a_thread_func()
-#endif
 {
 	return NULL;
 }

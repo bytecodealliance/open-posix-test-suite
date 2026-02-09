@@ -33,11 +33,7 @@
 
 int sem1;		/* Manual semaphore */
 
-#ifdef __wasi__
 void *a_thread_func(void* arg)
-#else
-void *a_thread_func()
-#endif
 {
 	
 	/* Indicate to main() that the thread was created. */

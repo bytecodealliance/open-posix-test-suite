@@ -17,27 +17,27 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
-// WASI-EDIT: removed unused include
+
 #include <errno.h>
 #include <string.h>
 #include "posixtest.h"
 
 int rc;
 
-// WASI-EDIT: removed sig_handler
+
 
 int main()
 {
 	pthread_barrier_t barrier;
 
-	// WASI-EDIT: removed signal handling setup
+	
 
 	/* Intialize return code */
 	rc = 1;	
 	
 	/* Call pthread_barrier_wait while refering to an un-initialized barrier object */
 	
-	// WASI-EDIT: removed alarm() call
+	
 	
 	rc = pthread_barrier_wait(&barrier);
 	
