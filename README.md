@@ -1,26 +1,21 @@
+<div align="center">
+  <h1><code>open-posix-test-suite</code></h1>
 
-SECTIONS:
-1. Open POSIX* Test Suite Overview
-2. Design Goals
-3. Implementation
-4. Developer Docs & Resources
-5. How to Contribute
-6. Who are you?
-7. Disclaimer
+<strong>A <a href="https://bytecodealliance.org/">Bytecode Alliance</a> hosted project</strong>
 
+  <p>
+`    <strong>A fork of the <a href="ttps://posixtest.sourceforge.net/">Open POSIX Test Suite</a> for <code><a href="https://github.com/WebAssembly/wasi-libc">wasi-libc</a></code></strong>
+`  </p>
+</div>
 
-
-1. Open POSIX* Test Suite Overview
------------------------------------
+## Open POSIX* Test Suite Overview
 
 The POSIX Test Suite is an open source test suite with the goal of
 performing conformance, functional, and stress testing of the IEEE
 1003.1-2001 System Interfaces specification in a manner that is
 agnostic to any given implementation.
 
-While active development and testing is currently happening on Linux,
-our choice of portable tools should make this test suite usable on any
-POSIX operating system.
+This fork of the Open POSIX Test Suite is maintained in aid of testing [`wasi-libc`](https://github.com/WebAssembly/wasi-libc).
 
 All code is distributed under the GNU General Public License v2.  A
 copy of this license is contained in the COPYING file.
@@ -29,8 +24,8 @@ This document gives a brief overview of the test suite, including its
 design goals, implementation, and how to contribute.  Within these
 sections, we describe where to find more detailed information.
 
-2. Design Goals
-----------------
+## Design Goals
+
 This project was created with the following design goals:
 - Enable assertion based traceability for conformance testing of POSIX
   specifications.  We wanted to capture enough data to make deterministic
@@ -43,8 +38,7 @@ This project was created with the following design goals:
 
 - Make it easy for test cases to be contributed.
 
-3. Implementation
-------------------
+## Implementation
 
 This project will cover conformance, functional, stress, performance,
 and speculative testing.  Conformance, functional, and stress tests are
@@ -61,8 +55,7 @@ For additional information on how to build and run the tests in this
 suite, see Documentation/HOWTO_RunTests.
 
 
-4. Developer Docs & Resources
-------------------------------
+## Developer Docs & Resources
 
 The following files give developers information on how to write test
 cases for the project (under Documentation):
@@ -78,45 +71,12 @@ HOWTO_Tagging         - describes how to tag files for inclusion in a release
 For additional information on how to build and run the tests in this
 suite, see HOWTO_RunTests.
 
-5. How to Contribute
----------------------
 
-* Patches welcome!
+## Disclaimer
 
-* When you create a new test, please fill out an assertion description
-  if none is available. Create a simple C [.c] or shell script [.sh]
-  snippet that exploits the assertion and returns 0 or !0
-  [passes/fails]. 
-
-  Please name the file after the assertion it tests-dash-the number of
-  the test [up to you, we can do the naming for you also].
-
-  The code snippets need to be as simple as possible, for the sake of
-  all. Please start them with a commentary briefly describing how
-  you will test the assertion. The idea is that at the end, we can have
-  automatic tools extracting the data from the XML and source files to
-  generate reports.
-
-
-6. Who are you?
----------------
-
-We are the ones currently developing this:
-
-julie.n.fleischer REMOVE-THIS AT intel DOT com
-rusty.lynch REMOVE-THIS AT intel DOT com
-geoffrey.r.gustafson REMOVE-THIS AT intel DOT com
-inaky.perez-gonzalez REMOVE-THIS AT intel DOT com
-rolla.n.selbak REMOVE-THIS AT intel DOT com
-majid.awad REMOVE-THIS AT intel DOT com
-salwan.searty REMOVE-THIS AT intel DOT com
-sunyi REMOVE-THIS AT users DOT sourceforge DOT net
-
-Some like to say 'Nih!' from time to time ...
-
-
-7. Disclaimer
---------------
 The Open POSIX Test Suite is not affiliated with the IEEE or The Open Group.
+
+--------
+
 
 * POSIX (R) is a registered trademark of the IEEE
