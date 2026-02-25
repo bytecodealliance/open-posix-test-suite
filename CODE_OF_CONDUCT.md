@@ -47,4 +47,5 @@ This Code of Conduct is adapted from the [Contributor Covenant][homepage], versi
 [OCoC]: https://github.com/bytecodealliance/open-posix-test-suite/blob/main/ORG_CODE_OF_CONDUCT.md
 [BACoC]: https://github.com/bytecodealliance/governance/blob/main/CODE_OF_CONDUCT.md
     [homepage]: https://www.contributor-covenant.org
-    [version]: https://www.contributor-covenant.org/version/1/4/
+[homepage]: https://www.contributor-covenant.org
+[version]: https://www.contributor-covenant.org/version/1/4/
