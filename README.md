@@ -4,8 +4,8 @@
 <strong>A <a href="https://bytecodealliance.org/">Bytecode Alliance</a> hosted project</strong>
 
   <p>
-`    <strong>A fork of the <a href="ttps://posixtest.sourceforge.net/">Open POSIX Test Suite</a> for <code><a href="https://github.com/WebAssembly/wasi-libc">wasi-libc</a></code></strong>
-`  </p>
+    <strong>A fork of the <a href="ttps://posixtest.sourceforge.net/">Open POSIX Test Suite</a> for <code><a href="https://github.com/WebAssembly/wasi-libc">wasi-libc</a></code></strong>
+  </p>
 </div>
 
 ## Open POSIX* Test Suite Overview
@@ -47,36 +47,29 @@ focus mainly on conformance; however, the other types of testing will be
 added as the need arises.
 
 For more information on these types of testing, under 'Documenation' see:
-HOWTO_ConformanceTest - info on creation and structure of conformance tests
-HOWTO_Functional-     - info on creation and structure of functional
-  StressTest            and stress tests
+
+- [HOWTO_ConformanceTest](https://github.com/bytecodealliance/open-posix-test-suite/blob/main/Documentation/HOWTO_ConformanceTest): info on creation and structure of conformance tests
+- [HOWTO_FunctionalStressTest](https://github.com/bytecodealliance/open-posix-test-suite/blob/main/Documentation/HOWTO_FunctionalStressTest): info on creation and structure of functional and stress tests
 
 For additional information on how to build and run the tests in this
-suite, see Documentation/HOWTO_RunTests.
+suite, see [wasi-libc](https://github.com/WebAssembly/wasi-libc).
 
 
 ## Developer Docs & Resources
 
 The following files give developers information on how to write test
 cases for the project (under Documentation):
-HOWTO_Assertions      - describes format of the assertions files used to
-                        map test case descriptions to test cases
-HOWTO_BoundaryTest    - information about testing boundary conditions
-HOWTO_CodingGuidelines- describes coding guidelines for this project
-HOWTO_Coverage        - describes format of COVERAGE.<area> files
-HOWTO_DefinitionsTest - ideas behind testing POSIX header files
-HOWTO_ResultCodes     - standardized return codes for tests
-HOWTO_Tagging         - describes how to tag files for inclusion in a release
-
-For additional information on how to build and run the tests in this
-suite, see HOWTO_RunTests.
-
+- [HOWTO_Assertions](https://github.com/bytecodealliance/open-posix-test-suite/blob/main/Documentation/HOWTO_Assertions): describes format of the assertions files used to map test case descriptions to test cases
+- [HOWTO_BoundaryTest](https://github.com/bytecodealliance/open-posix-test-suite/blob/main/Documentation/HOWTO_BoundaryTest): information about testing boundary conditions
+- [HOWTO_CodingGuidelines](https://github.com/bytecodealliance/open-posix-test-suite/blob/main/Documentation/HOWTO_CodingGuidelines): describes coding guidelines for this project
+- [HOWTO_Coverage](https://github.com/bytecodealliance/open-posix-test-suite/blob/main/Documentation/HOWTO_Coverage): describes format of COVERAGE.<area> files
+- [HOWTO_DefinitionsTest](https://github.com/bytecodealliance/open-posix-test-suite/blob/main/Documentation/HOWTO_DefinitionsTest): ideas behind testing POSIX header files
+- [HOWTO_ResultCodes](https://github.com/bytecodealliance/open-posix-test-suite/blob/main/Documentation/HOWTO_ResultCodes): standardized return codes for tests
 
 ## Disclaimer
 
 The Open POSIX Test Suite is not affiliated with the IEEE or The Open Group.
 
 --------
-
 
 * POSIX (R) is a registered trademark of the IEEE
