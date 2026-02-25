@@ -21,8 +21,9 @@
 #include <unistd.h>
 #include "posixtest.h"
 
-void *a_thread_func()
+void *a_thread_func(void* arg)
 {
+	(void)arg;
 	sleep(10);
 
 	/* Shouldn't reach here.  If we do, then the pthread_cancel()

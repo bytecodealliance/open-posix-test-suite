@@ -18,9 +18,9 @@
 #include <stdio.h>
 #include "posixtest.h"
 
-void *a_thread_func()
+void *a_thread_func(void* arg)
 {
-	
+	(void)arg;
 	pthread_exit(0);
 	return NULL;
 }
