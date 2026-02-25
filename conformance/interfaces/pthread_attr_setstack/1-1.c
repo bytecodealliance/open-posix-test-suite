@@ -52,12 +52,17 @@ int main()
 		exit(PTS_UNRESOLVED);
 	}
 	
+	// WASI-CHANGE: malloc stack instead of assuming a default one, which is unspecified by POSIX
+#ifdef __wasi__
+	stack_addr = malloc(PTHREAD_STACK_MIN);
+#else
 	/* Get the default stack_addr and stack_size value */	
 	rc = pthread_attr_getstack(&attr, &stack_addr, &stack_size); 	
 	if( rc != 0) {
 		perror(ERROR_PREFIX "pthread_attr_getstack");
 		exit(PTS_UNRESOLVED);
 	}
+#endif
 	/* printf("stack_addr = %p, stack_size = %u\n", stack_addr, stack_size); */
 
 	stack_size = PTHREAD_STACK_MIN;
