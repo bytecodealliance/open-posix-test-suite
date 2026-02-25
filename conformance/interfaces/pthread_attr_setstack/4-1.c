@@ -44,7 +44,6 @@ void *thread_func()
 		perror(ERROR_PREFIX "stack wrong");
 		exit(PTS_FAIL);
 	}
-	pthread_exit(0);
 	return NULL;
 }
 int main()

@@ -62,7 +62,6 @@ void *a_thread_func()
 	pthread_cleanup_pop(1);
 	pthread_cleanup_pop(1);
 
-	pthread_exit(0);
 	return NULL;
 }
 

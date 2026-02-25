@@ -31,7 +31,6 @@ void *a_thread_func(void* num)
 	for(j=0;j<NUM_THREADS;j++)
 		printf("Passed argument %d for thread\n", i[j]);
 
-	pthread_exit(0);
 	return NULL;
 }
 

@@ -91,7 +91,6 @@ static void* fn_wr(void *arg)
 	/* Get time after the mutex timed out in locking. */
 	gettimeofday(&currsec2, NULL);
 	thread_state = EXITING_THREAD;
-	pthread_exit(0);
 	return NULL;
 }
  

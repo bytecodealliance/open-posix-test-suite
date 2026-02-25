@@ -22,7 +22,6 @@
 /* Thread starting routine that really does nothing. */
 void *a_thread_func()
 {
-	pthread_exit(0);
 	return NULL;
 }
 

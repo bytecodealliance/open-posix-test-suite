@@ -52,7 +52,6 @@ void *a_thread_func()
 	}
 	
 	/* The thread ends here, the destructor for the key should now be called after this */
-	pthread_exit(0);
 }
 
 int main()

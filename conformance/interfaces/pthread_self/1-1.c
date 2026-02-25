@@ -29,7 +29,6 @@ pthread_t new_th2;	/* Global thread to hold the value of when pthread_self
 void *a_thread_func()
 {
 	new_th2=pthread_self();
-	pthread_exit(0);
 	return NULL;
 }
 

@@ -83,7 +83,6 @@ static void* fn_rd(void *arg)
 	/* Get time after the pthread_rwlock_timedrdlock() call. */
 	gettimeofday(&currsec2, NULL);
 	thread_state = EXITING_THREAD;
-	pthread_exit(0);
 	return NULL;
 }
  

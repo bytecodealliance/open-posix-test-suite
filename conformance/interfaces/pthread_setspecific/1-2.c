@@ -48,7 +48,6 @@ void *a_thread_func()
 	/* Get the bound value of the key that we just set. */
 	rc2 = pthread_getspecific(key);
 
-	pthread_exit(0);
 	return NULL;
 
 }

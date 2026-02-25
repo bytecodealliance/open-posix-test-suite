@@ -38,7 +38,6 @@ void *a_thread_func()
 		return (void *)PTS_UNRESOLVED;
 	}
 	
-	pthread_exit(0);
 	return NULL;
 }
 

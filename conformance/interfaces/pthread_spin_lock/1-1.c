@@ -39,7 +39,6 @@ volatile static int thread_state;
 static void sig_handler()
 {
 	/* Just return */
-	pthread_exit(0);
 	return;
 }
 

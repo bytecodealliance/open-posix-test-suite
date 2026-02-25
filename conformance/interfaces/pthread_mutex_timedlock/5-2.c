@@ -117,6 +117,5 @@ void *f1(void *parm)
 		return (void*)PTS_UNRESOLVED;
 	}
 
-  	pthread_exit(0);
   	return (void*)(0);
 }

@@ -35,7 +35,6 @@ void *a_thread_func()
 			ts.tv_sec, ts.tv_nsec);
 		exit(PTS_FAIL);
 	}
-	pthread_exit(0);
 	return NULL;
 }
 

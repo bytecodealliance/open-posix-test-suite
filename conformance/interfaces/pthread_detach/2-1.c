@@ -33,7 +33,6 @@ void *a_thread_func()
 	sleep(10);	
 
 	perror("Thread couldn't be canceled (at cleanup time), timing out\n");
-	pthread_exit(0);
 	return NULL;
 }
 

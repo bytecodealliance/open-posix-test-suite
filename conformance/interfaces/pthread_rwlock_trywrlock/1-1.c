@@ -58,7 +58,6 @@ static void* fn_wr(void *arg)
 	get_ebusy = 1;
 	printf("thread: correctly got EBUSY\n");
 	thread_state = EXITING_THREAD;
-	pthread_exit(0);
 	return NULL;
 }
  

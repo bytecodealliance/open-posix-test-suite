@@ -60,7 +60,6 @@ void *thread_func()
 	}	
 	/* printf("saddr = %p, ssize = %u\n", saddr, ssize); */
 
-	pthread_exit(0);
 	return NULL;
 }
 

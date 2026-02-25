@@ -54,7 +54,6 @@ void *a_thread_func()
 	/* Should reach here if the thread correctly ignores the cancel
 	 * request. */
 	cancel_flag=1;
-	pthread_exit(0);
 	return NULL;
 }
 

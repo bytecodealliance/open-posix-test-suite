@@ -76,7 +76,6 @@ void *a_thread_func()
 	/* Should not get here if the cancel request was honored at the cancelation point
 	 * pthread_testcancel(). */
 	cleanup_flag=-2;
-	pthread_exit(0);
 	return NULL;
 }
 

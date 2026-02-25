@@ -56,7 +56,6 @@ void *a_thread_func()
 	 * will result. */
 	pthread_cleanup_pop(0);
 	perror("Operation timed out, thread could not be canceled\n");
-	pthread_exit(0);
 	return NULL;
 }
 

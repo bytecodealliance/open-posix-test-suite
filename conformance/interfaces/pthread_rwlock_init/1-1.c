@@ -51,7 +51,6 @@ static void* fn_rd(void *arg)
 	}
 	
 	thread_state = 3;
-	pthread_exit(0);
 	return NULL;
 }
  

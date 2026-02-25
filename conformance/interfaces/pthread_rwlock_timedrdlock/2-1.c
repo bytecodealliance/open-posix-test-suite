@@ -85,7 +85,6 @@ static void* fn_rd(void *arg)
 	/* Get time after the mutex timed out in locking. */
 	currsec2 = time(NULL);
 	thread_state = EXITING_THREAD;
-	pthread_exit(0);
 	return NULL;
 }
  

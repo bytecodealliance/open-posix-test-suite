@@ -67,7 +67,6 @@ static void* fn_wr(void *arg)
 	}
 	
 	thread_state = EXITING_THREAD;
-	pthread_exit(0);
 	return NULL;
 }
  

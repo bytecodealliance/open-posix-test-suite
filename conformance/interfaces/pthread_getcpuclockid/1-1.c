@@ -39,7 +39,6 @@ void *thread_func()
         }
 	printf("clock id of new thread is %d\n", cid);
 
-	pthread_exit(0);
 	return NULL;
 }
 

@@ -55,7 +55,6 @@ void *a_thread_func(void *tmp)
 		exit(PTS_UNRESOLVED);
 	}
 	
-	pthread_exit(0);
 	return NULL;
 }
 

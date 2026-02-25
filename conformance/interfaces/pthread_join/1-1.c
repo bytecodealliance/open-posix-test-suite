@@ -38,7 +38,6 @@ void *a_thread_func()
 	/* Indicate that the thread has ended execution. */
 	end_exec=1;
 	
-	pthread_exit(0);
 	return NULL;
 }
 

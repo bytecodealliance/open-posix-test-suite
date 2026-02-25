@@ -17,7 +17,6 @@
 
 void *thread_func()
 {
-	pthread_exit(0);
 	return (void*)(0);
 }
 

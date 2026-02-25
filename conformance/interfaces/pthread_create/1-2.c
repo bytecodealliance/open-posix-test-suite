@@ -28,7 +28,6 @@ void *a_thread_func()
 	/* Shouldn't reach here.  If we do, then the pthread_cancel()
 	 * function did not succeed. */
 	perror("Could not send cancel request correctly\n");
-	pthread_exit(0);
 	return NULL;
 }
 

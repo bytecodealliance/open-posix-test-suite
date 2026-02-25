@@ -101,6 +101,5 @@ void *func(void *parm)
 		pthread_exit((void*)PTS_UNRESOLVED);
 	}
 
-  	pthread_exit(0);
   	return (void*)(0);
 }
