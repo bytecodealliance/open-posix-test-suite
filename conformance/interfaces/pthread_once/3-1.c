@@ -32,11 +32,7 @@ pthread_once_t once_control;
 int init_flag;
 
 /* The init function that pthread_once calls */
-#ifdef __wasi__
 void an_init_func(void)
-#else
-void *an_init_func()
-#endif
 {
 	/* Indicate to main() that the init function has been reached */
 	init_flag=1;
@@ -48,17 +44,10 @@ void *an_init_func()
 	/* The thread could not be canceled, timeout after 10 secs */
 	perror("Init function timed out (10 secs), thread could not be canceled\n");
 	init_flag=-1;
-	#ifndef __wasi__
-	return NULL;
-	#endif
 }
 
 /* Thread function */
-#ifdef __wasi__
 void *a_thread_func(void* arg)
-#else
-void *a_thread_func()
-#endif
 {
 	/* Make the thread cancelable immediately */
 	pthread_setcanceltype(PTHREAD_CANCEL_ASYNCHRONOUS, NULL);

@@ -14,9 +14,7 @@
 
 pthread_once_t dummy = PTHREAD_ONCE_INIT;
 
-#ifdef __wasi__
 int main()
 {
   return 0;
 }
-#endif

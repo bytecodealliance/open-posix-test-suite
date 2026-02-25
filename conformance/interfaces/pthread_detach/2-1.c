@@ -29,11 +29,7 @@ static volatile int thread_started = 0;
 static volatile int thread_still_running = 0;
 #endif
 
-#ifdef __wasi__
 void *a_thread_func(void* arg)
-#else
-void *a_thread_func()
-#endif
 {
 #ifndef __wasi__	
 	pthread_setcanceltype(PTHREAD_CANCEL_ASYNCHRONOUS, NULL);
@@ -43,7 +39,7 @@ void *a_thread_func()
 
 	perror("Thread couldn't be canceled (at cleanup time), timing out\n");
 #else
-	/* On WASI, signal we started and keep running for a while */
+	/*  WASI-CHANGE: On WASI, signal we started and keep running for a while */
 	thread_started = 1;
 	thread_still_running = 1;
 	

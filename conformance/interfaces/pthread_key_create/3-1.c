@@ -38,11 +38,7 @@ void dest_func(void *p)
 }
 
 /* Thread function */
-#ifdef __wasi__
 void *a_thread_func(void* arg)
-#else
-void *a_thread_func()
-#endif
 {
 
 	/* Set the value of the key to a value */	

@@ -31,11 +31,7 @@
 int sem;	/* Manual semaphore used to indicate when the thread has been created. */
 
 /* Thread's function. */
-#ifdef __wasi__
 void *a_thread_func(void* arg)
-#else
-void *a_thread_func()
-#endif
 {
 	sem=INMAIN;
 	pthread_exit((void*)RETURN_CODE);

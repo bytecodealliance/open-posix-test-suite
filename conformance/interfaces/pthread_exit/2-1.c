@@ -29,11 +29,7 @@ int i[3], j;
 
 /* Cleanup function that the thread executes when it is canceled.  So if
  * cleanup_flag is 1, it means that the thread was canceled. */
-#ifdef __wasi__
 void a_cleanup_func1(void* arg)
-#else
-void a_cleanup_func1()	
-#endif
 {
 	i[j]=1;
 	j++;
@@ -42,11 +38,7 @@ void a_cleanup_func1()
 
 /* Cleanup function that the thread executes when it is canceled.  So if
  * cleanup_flag is 1, it means that the thread was canceled. */
-#ifdef __wasi__
 void a_cleanup_func2(void* arg)
-#else
-void a_cleanup_func2()	
-#endif
 {
 	i[j]=2;
 	j++;
@@ -55,22 +47,14 @@ void a_cleanup_func2()
 
 /* Cleanup function that the thread executes when it is canceled.  So if
  * cleanup_flag is 1, it means that the thread was canceled. */
-#ifdef __wasi__
 void a_cleanup_func3(void* arg)
-#else
-void a_cleanup_func3()	
-#endif
 {
 	i[j]=3;
 	j++;
 	return;
 }
 /* Thread's function. */
-#ifdef __wasi__
 void *a_thread_func(void* arg)
-#else
-void *a_thread_func()
-#endif
 {
 	/* Set up 3 cleanup handlers */
 	pthread_cleanup_push(a_cleanup_func1,NULL);

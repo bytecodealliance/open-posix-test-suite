@@ -37,7 +37,7 @@
 int NUM_OF_KEYS = PTHREAD_KEYS_MAX;
 
 #ifdef __wasi__
-// wrong size in test
+// WASI-CHANGE: wrong size in test
 static pthread_key_t keys[PTHREAD_KEYS_MAX + 1];
 #else
 static pthread_key_t keys[5];
@@ -48,7 +48,7 @@ int main()
 	int i, rc;
 
 #ifdef __wasi__
-	// off by one error in test
+	// WASI-CHANGE: off by one error in test
 	for(i = 0;i<NUM_OF_KEYS;i++)
 #else
 	for(i = 0;i<=NUM_OF_KEYS;i++)
@@ -79,7 +79,7 @@ int main()
 	}
 
 	#ifdef __wasi__
-	// extra test to ensure we do reach the limit
+	// WASI-CHANGE: extra test to ensure we do reach the limit
 	rc = pthread_key_create(&keys[NUM_OF_KEYS], NULL);
 	if (rc != EAGAIN)
 	{

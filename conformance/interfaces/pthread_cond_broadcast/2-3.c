@@ -49,8 +49,6 @@
  #include <string.h>
  #include <time.h>
  
- #define _WASI_EMULATED_MMAN
- #include <sys/mman.h>
  #include <sys/wait.h>
  
 /********************************************************************************************/
@@ -334,6 +332,9 @@ int main (int argc, char * argv[])
 	}
 	else
 	{
+		#ifdef __wasi__
+		UNRESOLVED(-1, "WASI does not support mmap, which is required for this test");
+		#else
 		/* We will place the test data in a mmaped file */
 		char filename[] = "/tmp/cond_broadcast-XXXXXX";
 		size_t sz, ps;
@@ -376,6 +377,7 @@ int main (int argc, char * argv[])
 		/* Our datatest structure is now in shared memory */
 		#if VERBOSE > 1
 		output("Testdata allocated in shared memory (%ib).\n", sizeof(testdata_t));
+		#endif
 		#endif
 	}
 	

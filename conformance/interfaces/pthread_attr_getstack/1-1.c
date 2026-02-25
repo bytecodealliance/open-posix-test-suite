@@ -44,7 +44,7 @@ int main()
 	}
 	
 	
-	// If the pthread_attr_getstack() function is called before the stackaddr attribute has been set, the behavior is unspecified.
+	// WASI-CHANGE: If the pthread_attr_getstack() function is called before the stackaddr attribute has been set, the behavior is unspecified.
 	#ifndef __wasi__ 
 	/* Get the default stack_addr and stack_size value */	
 	rc = pthread_attr_getstack(&attr, &stack_addr, &stack_size); 	

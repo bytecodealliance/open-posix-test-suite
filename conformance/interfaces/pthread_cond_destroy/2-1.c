@@ -47,15 +47,8 @@
  #include <unistd.h>
 
  #include <errno.h>
- #ifndef __wasi__
- #include <signal.h>
- #endif
  #include <string.h>
  #include <time.h>
- #ifndef __wasi__
- #include <sys/mman.h>
- #include <sys/wait.h>
- #endif
  
 /********************************************************************************************/
 /******************************   Test framework   *****************************************/

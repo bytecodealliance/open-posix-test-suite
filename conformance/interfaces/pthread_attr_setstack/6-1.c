@@ -47,7 +47,7 @@ int main()
 		exit(PTS_UNRESOLVED);
 	}
 	
-	
+	// WASI-CHANGE: malloc stack instead of assuming a default one (unspecified by spec)
 	stack_addr = malloc(PTHREAD_STACK_MIN);
 
 	/* printf("stack_addr = %p, stack_size = %u\n", stack_addr, stack_size); */

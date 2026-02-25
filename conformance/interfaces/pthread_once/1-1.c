@@ -29,16 +29,9 @@
 int init_flag;
 
 /* The init function that pthread_once calls */
-#ifdef __wasi__
 void an_init_func(void)
-#else
-void *an_init_func()
-#endif
 {
 	init_flag++;
-	#ifndef __wasi__
-	return NULL;
-	#endif
 }
 
 int main()

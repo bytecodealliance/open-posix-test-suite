@@ -106,24 +106,22 @@ sem_t sem_sync;
 void * threaded (void * arg)
 {
 	int ret=0;
-	printf("Thread is running\n");
+	
 	if (arg != NULL)
 	{
-		printf("Thread will detach itself\n");
 		ret = pthread_detach(pthread_self());
 		if (ret != 0)  {  UNRESOLVED(ret, "Failed to detach the thread");  }
 	}
-	printf("Thread is waiting for the main thread to allow it to terminate\n");
 	/* Wait for this semaphore which indicates that pthread_detach has been called */
-	do { ret = sem_wait(&sem_sync); printf("sem_wait returned with ret=%i and errno=%i\n", ret, errno); }
+	do { ret = sem_wait(&sem_sync); }
 	while ((ret == -1) && (errno == EINTR));
 	if (ret == -1)  {  UNRESOLVED(errno, "Failed to wait for the semaphore");  }
-	printf("Thread is terminating now\n");
+	
 	/* Post the semaphore to indicate the main thread we're alive */
 	do { ret = sem_post(&(scenarii[sc].sem)); }
 	while ((ret == -1) && (errno == EINTR));
 	if (ret == -1)  {  UNRESOLVED(errno, "Failed to post the semaphore");  }
-	printf("Thread has posted the semaphore, now exiting\n");
+	
 	return arg;
 }
 
@@ -184,19 +182,19 @@ int main (int argc, char *argv[])
 				ret = pthread_detach(child);
 				if (ret != 0)  {  UNRESOLVED(ret, "Failed to detach the child thread.");  }
 			}
-			printf("Main thread has detached (if needed), now allowing the thread to terminate\n");
+			
 			/* Now, allow the thread to terminate */
-			do { ret = sem_post(&sem_sync); printf("sem_post returned with ret=%i and errno=%i\n", ret, errno); }
+			do { ret = sem_post(&sem_sync); }
 			while ((ret == -1) && (errno == EINTR));
 			if (ret == -1)  {  UNRESOLVED(errno, "Failed to post the semaphore");  }
-			printf("Main thread has posted the semaphore, now waiting for the thread to terminate\n");
+	
 			/* Just wait for the thread to terminate */
 			ret = clock_gettime(CLOCK_REALTIME, &ts);
 			if (ret != 0)  {  UNRESOLVED(ret, "Failed to get time");  }
 			
 			ts.tv_sec += TIMEOUT;
 			
-			do { ret = sem_timedwait(&(scenarii[sc].sem), NULL); printf("sem_timedwait returned with ret=%i and errno=%i\n", ret, errno); }
+			do { ret = sem_timedwait(&(scenarii[sc].sem), &ts); }
 			while ((ret == -1) && (errno == EINTR));
 			if (ret == -1)  
 			{
