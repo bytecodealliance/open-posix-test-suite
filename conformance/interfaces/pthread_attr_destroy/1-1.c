@@ -28,7 +28,7 @@
 void *a_thread_func()
 {
 	
-		return NULL;
+	return NULL;
 }
 
 int main()
