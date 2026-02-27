@@ -23,9 +23,9 @@
 #include "posixtest.h"
 
 /* Thread function */
-void *a_thread_func()
+void *a_thread_func(void* arg)
 {
-	
+	(void)arg;
 	pthread_setcanceltype(PTHREAD_CANCEL_ASYNCHRONOUS, NULL);
 
 	/* If the thread wasn't canceled in 10 seconds, time out */

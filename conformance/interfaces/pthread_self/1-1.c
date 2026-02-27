@@ -26,8 +26,9 @@
 pthread_t new_th2;	/* Global thread to hold the value of when pthread_self
 			   returns from the thread function. */
 
-void *a_thread_func()
+void *a_thread_func(void* arg)
 {
+	(void)arg;
 	new_th2=pthread_self();
 	return NULL;
 }

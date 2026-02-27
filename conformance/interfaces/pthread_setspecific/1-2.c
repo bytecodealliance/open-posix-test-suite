@@ -34,8 +34,9 @@ pthread_key_t key;
 void* rc1;
 void* rc2;
 
-void *a_thread_func()
+void *a_thread_func(void* arg)
 {
+	(void)arg;
 	/* Bind a value to key for this thread (this will be different from the value
 	 * that we bind for the main thread) */
 	if(pthread_setspecific(key, (void *)(KEY_VALUE_2)) != 0)

@@ -29,8 +29,9 @@
 
 #define STACKADDROFFSET 0x8000000
 
-void *thread_func()
+void *thread_func(void* arg)
 {
+	(void)arg;
 	return NULL;
 }
 int main()

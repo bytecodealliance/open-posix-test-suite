@@ -32,7 +32,7 @@ pthread_once_t once_control;
 int init_flag;
 
 /* The init function that pthread_once calls */
-void *an_init_func()
+void an_init_func(void)
 {
 	/* Indicate to main() that the init function has been reached */
 	init_flag=1;
@@ -44,21 +44,21 @@ void *an_init_func()
 	/* The thread could not be canceled, timeout after 10 secs */
 	perror("Init function timed out (10 secs), thread could not be canceled\n");
 	init_flag=-1;
-	return NULL;
 }
 
 /* Thread function */
-void *a_thread_func()
+void *a_thread_func(void* arg)
 {
+	(void)arg;
 	/* Make the thread cancelable immediately */
 	pthread_setcanceltype(PTHREAD_CANCEL_ASYNCHRONOUS, NULL);
 
-	pthread_once(&once_control, (void*)an_init_func);
+	pthread_once(&once_control, an_init_func);
 	return NULL;
 }
 
 /* 2nd init function used by the 2nd call of pthread_once */
-void *an_init_func2()
+void *an_init_func2(void)
 {
 	/* Indicate to main() that this init function has been reached */
 	init_flag=1;
@@ -104,7 +104,7 @@ int main()
 
 	/* Should be able to call pthread_once() again with the same
 	 * pthread_once_t object. */
-	pthread_once(&once_control, (void*)an_init_func2);
+	pthread_once(&once_control, an_init_func2);
 
 	/* If the init function from the 2nd call to pthread_once() was not
  	 * reached, the test fails. */	

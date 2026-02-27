@@ -41,9 +41,9 @@ void dest_func(void *p)
 }
 
 /* Thread function */
-void *a_thread_func()
+void *a_thread_func(void* arg)
 {
-
+	(void)arg;
 	/* Set the value of the key to a value */	
 	if(pthread_setspecific(key, (void *)(KEY_VALUE)) != 0)
 	{
