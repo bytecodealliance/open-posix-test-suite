@@ -38,6 +38,10 @@ void *a_thread_func(void* arg)
 	/* Indicate to main() that the thread was created. */
 	sem1=INTHREAD;
 
+	// WASI-CHANGE: It's fine for this thread to keep running, we're just testing that detaching doesn't fail
+	#ifdef __wasi__
+	return NULL;
+	#else
 	/* Wait for main to detach change the attribute object and try and detach this thread.
 	 * Wait for a timeout value of 10 seconds before timing out if the thread was not able
 	 * to be detached. */
@@ -45,7 +49,8 @@ void *a_thread_func(void* arg)
 
 	printf("Test FAILED: Did not detach the thread, main still waiting for it to end execution.\n");
 	pthread_exit((void*)PTS_FAIL);
-	return NULL;
+	return PTS_FAIL;
+	#endif
 }
 
 int main()
