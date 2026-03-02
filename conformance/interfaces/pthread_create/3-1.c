@@ -49,7 +49,7 @@ void *a_thread_func(void* arg)
 
 	printf("Test FAILED: Did not detach the thread, main still waiting for it to end execution.\n");
 	pthread_exit((void*)PTS_FAIL);
-	return PTS_FAIL;
+	return NULL;
 	#endif
 }
 
