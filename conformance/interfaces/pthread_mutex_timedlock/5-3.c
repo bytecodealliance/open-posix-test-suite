@@ -111,6 +111,5 @@ void *f1(void *parm)
 	 * Save the return value. */
 	ret = pthread_mutex_timedlock(&mutex, &timeout);
 
-  	pthread_exit(0);
   	return (void*)(0);
 }

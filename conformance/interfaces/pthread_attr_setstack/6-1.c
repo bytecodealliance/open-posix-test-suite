@@ -34,7 +34,6 @@ size_t stack_size;
 void *thread_func(void* arg)
 {
 	(void)arg;
-	pthread_exit(0);
 	return NULL;
 }
 int main()

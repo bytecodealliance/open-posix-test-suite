@@ -131,6 +131,5 @@ void *f1(void *parm)
 	/* Get time after the mutex timed out in locking. */
 	gettimeofday(&currsec2, NULL);
 
-  	pthread_exit(0);
   	return (void*)(0);
 }

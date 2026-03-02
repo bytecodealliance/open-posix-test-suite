@@ -35,7 +35,6 @@ void *a_thread_func()
 		exit(PTS_FAIL);
 	}
 	printf("policy: %d, priority: %d\n", policy, sparam.sched_priority);	
-	pthread_exit(0);
 	return NULL;
 }
 

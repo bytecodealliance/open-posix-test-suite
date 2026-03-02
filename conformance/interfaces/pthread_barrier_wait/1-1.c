@@ -52,7 +52,6 @@ static void* fn_chld(void *arg)
 	} 
 	
 	thread_state = EXITING_THREAD;
-	pthread_exit(0);
 	return NULL;
 }
 

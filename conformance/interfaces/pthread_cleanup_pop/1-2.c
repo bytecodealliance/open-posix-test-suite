@@ -55,7 +55,6 @@ void *a_thread_func(void* arg)
 	while (sem1 == INMAIN)
 		sleep(1);
 
-	pthread_exit(0);
 	return NULL;
 }
 

@@ -106,7 +106,6 @@ static void * th_fn(void *arg)
 	gettimeofday(&after_wait, NULL);
 
 	thread_state = EXITING_THREAD;
-	pthread_exit(0);
 	return NULL;
 }
 

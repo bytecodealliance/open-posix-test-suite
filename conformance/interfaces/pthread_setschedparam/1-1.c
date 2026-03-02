@@ -42,7 +42,6 @@ void *a_thread_func()
 		exit(PTS_FAIL);
 	}
 	
-	pthread_exit(0);
 	return NULL;
 }
 

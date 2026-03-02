@@ -41,7 +41,6 @@ void *a_thread_func(void* arg)
 		pthread_exit((void*)PTS_FAIL);
 	}
 
-	pthread_exit(0);
 }
 
 int main()

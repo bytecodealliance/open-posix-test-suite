@@ -93,6 +93,5 @@ void *func(void *parm)
       		}
     		sleep(1);
   	}
-  	pthread_exit(0);
   	return (void*)(0);
 }

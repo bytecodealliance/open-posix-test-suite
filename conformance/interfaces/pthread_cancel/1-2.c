@@ -65,7 +65,6 @@ void *a_thread_func()
 	 * request. */
 	pthread_cleanup_pop(0);
 	cleanup_flag=1;
-	pthread_exit(0);
 	return NULL;
 }
 

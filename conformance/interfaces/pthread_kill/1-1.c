@@ -70,7 +70,6 @@ void *a_thread_func()
 	sleep(5);
 
 	handler_called=-1;
-	pthread_exit(0);
 	return NULL;
 }
 

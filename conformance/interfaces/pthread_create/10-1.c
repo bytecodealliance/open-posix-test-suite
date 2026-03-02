@@ -60,7 +60,6 @@ void *a_thread_func()
 	/* Indicate that the thread start routine was reached.  If it was reached, the test
 	 * fails, as the thread should have not been created in the first place. */
 	created_thread = 1;
-	pthread_exit(0);
 	return NULL;
 }
 

@@ -28,7 +28,6 @@ void *a_thread_func(void* num)
 	intptr_t i = (intptr_t) num;
 	printf("Passed argument for thread: %d\n", (int)i);
 
-	pthread_exit(0);
 	return NULL;
 }
 

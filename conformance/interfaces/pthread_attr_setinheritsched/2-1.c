@@ -49,7 +49,6 @@ void *thread_func()
 		       "inherited from creating thread \n");
 		exit(PTS_FAIL);
 	}		
-	pthread_exit(0);
 	return NULL;
 }
 int main()

@@ -30,7 +30,6 @@ volatile int thread_created = 0;
 void *thread_func()
 {
 	thread_created = 1;
-	pthread_exit(0);
 	return (void*)(0);
 }
 

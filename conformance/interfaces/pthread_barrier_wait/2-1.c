@@ -62,7 +62,6 @@ static void* fn_chld(void *arg)
 		normal_rt++;
 	}
 	
-	pthread_exit(0);
 	return NULL;
 }
  

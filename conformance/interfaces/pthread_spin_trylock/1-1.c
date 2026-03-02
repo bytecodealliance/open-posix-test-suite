@@ -70,7 +70,6 @@ static void* fn_chld(void *arg)
 	printf("thread: attempt trylock\n");
 	rc = pthread_spin_trylock(&spinlock);
 
-	pthread_exit(0);
 	return NULL;
 }
  

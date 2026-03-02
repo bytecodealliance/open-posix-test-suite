@@ -107,7 +107,6 @@ static void* fn_rd(void *arg)
 		printf("rd_thread: Error at pthread_rwlock_unlock()\n");
 		exit(PTS_UNRESOLVED);
 	}
-	pthread_exit(0);
 	return NULL;
 }
  
@@ -145,7 +144,6 @@ static void* fn_wr_1(void *arg)
 		exit(PTS_UNRESOLVED);
 	}
 
-	pthread_exit(0);
 	return NULL;
 }
  
@@ -182,7 +180,6 @@ static void* fn_wr_2(void *arg)
 		exit(PTS_UNRESOLVED);
 	}
 
-	pthread_exit(0);
 	return NULL;
 }
 

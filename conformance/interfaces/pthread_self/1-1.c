@@ -30,7 +30,6 @@ void *a_thread_func(void* arg)
 {
 	(void)arg;
 	new_th2=pthread_self();
-	pthread_exit(0);
 	return NULL;
 }
 

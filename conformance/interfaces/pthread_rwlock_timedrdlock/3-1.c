@@ -97,7 +97,6 @@ static void* fn_rd(void *arg)
 	gettimeofday(&currsec2, NULL);
 #endif
 	thread_state = EXITING_THREAD;
-	pthread_exit(0);
 	return NULL;
 }
  

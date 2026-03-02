@@ -63,6 +63,5 @@ void *a_thread_func(void* arg)
 {
 	(void)arg;
 	self_th=pthread_self();
-	pthread_exit(0);
 	return NULL;
 }

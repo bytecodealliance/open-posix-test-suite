@@ -87,7 +87,6 @@ static void* fn_rd_1(void *arg)
 		exit(PTS_UNRESOLVED);
 	}	
 	thread_state = EXITING_THREAD;
-	pthread_exit(0);
 	return NULL;
 }
  
@@ -140,7 +139,6 @@ static void* fn_rd_2(void *arg)
 		exit(PTS_UNRESOLVED);
 	}	
 	thread_state = EXITING_THREAD;
-	pthread_exit(0);
 	return NULL;
 }
 
