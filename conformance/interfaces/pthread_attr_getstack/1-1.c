@@ -43,6 +43,10 @@ int main()
 		exit(PTS_UNRESOLVED);
 	}
 	
+	/* WASI-CHANGE The POSIX spec does not specify that pthread_attr_getstack
+	  must succeed before pthread_attr_setstack is called, and
+	  wasi-libc returns EINVAL in that case. */
+	#ifndef __wasi__
 	/* Get the default stack_addr and stack_size value */	
 	rc = pthread_attr_getstack(&attr, &stack_addr, &stack_size); 	
 	if( rc != 0) {
@@ -50,6 +54,7 @@ int main()
 		exit(PTS_UNRESOLVED);
 	}
 	printf("stack_addr = %p, stack_size = %zu\n", stack_addr, stack_size);
+	#endif 
 
 	stack_size = PTHREAD_STACK_MIN;
 
