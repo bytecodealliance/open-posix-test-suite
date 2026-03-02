@@ -29,10 +29,9 @@
 int init_flag;
 
 /* The init function that pthread_once calls */
-void *an_init_func()
+void an_init_func(void)
 {
 	init_flag++;
-	return NULL;
 }
 
 int main()
@@ -42,11 +41,11 @@ int main()
 	init_flag=0;
 	
 	/* Call pthread_once, passing it the once_control */
-	pthread_once(&once_control, (void*)an_init_func);
+	pthread_once(&once_control, an_init_func);
 
 	/* Call pthread_once again. The init function should not be 
 	 * called. */
-	pthread_once(&once_control, (void*)an_init_func);
+	pthread_once(&once_control, an_init_func);
 
 	if(init_flag != 1)
 	{

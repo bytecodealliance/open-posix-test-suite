@@ -36,8 +36,9 @@
 #include "posixtest.h"
 
 /* Thread's function. */
-void *a_thread_func()
+void *a_thread_func(void* arg)
 {
+	(void)arg;
 	return NULL;
 }
 

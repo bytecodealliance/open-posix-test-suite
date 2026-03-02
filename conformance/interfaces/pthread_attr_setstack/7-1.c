@@ -32,8 +32,9 @@
 static void *stack_addr;
 size_t stack_size;
 
-void *thread_func()
+void *thread_func(void* arg)
 {
+	(void)arg;
 	return NULL;
 }
 int main()
