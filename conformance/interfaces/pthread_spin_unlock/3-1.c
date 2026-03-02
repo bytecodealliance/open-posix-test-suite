@@ -71,7 +71,6 @@ static void* fn_chld(void *arg)
 		exit(PTS_UNRESOLVED);
 	}	
 
-	pthread_exit(0);
 	return NULL;
 }
  

@@ -33,7 +33,6 @@ void *a_thread_func()
 	/* Set cancel state to an invalid integer and save the return value. */
 	ret=pthread_setcancelstate(-100, NULL);
 
-	pthread_exit(0);
 	return NULL;
 }
 

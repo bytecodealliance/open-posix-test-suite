@@ -28,6 +28,7 @@
 
 void *a_thread_func(void* arg)
 {
+	(void)arg;
 #ifndef __wasi__
 	pthread_setcanceltype(PTHREAD_CANCEL_ASYNCHRONOUS, NULL);
 

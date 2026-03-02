@@ -61,6 +61,7 @@ int main()
 /* The thread function that calls pthread_self() to obtain its thread ID */
 void *a_thread_func(void* arg)
 {
+	(void)arg;
 	self_th=pthread_self();
 	return NULL;
 }

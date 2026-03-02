@@ -33,6 +33,7 @@ size_t stack_size;
 
 void *thread_func(void* arg)
 {
+	(void)arg;
 	return NULL;
 }
 int main()

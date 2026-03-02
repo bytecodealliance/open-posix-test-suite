@@ -155,6 +155,5 @@ void *f1(void *parm)
 #else
 	gettimeofday(&currsec2, NULL);
 #endif
-  	pthread_exit(0);
   	return (void*)(0);
 }

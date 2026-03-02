@@ -39,6 +39,7 @@ size_t stack_size;
 
 void *thread_func(void* arg)
 {
+	(void)arg;
 	pthread_attr_t attr;
 	void *saddr;
 	size_t ssize;

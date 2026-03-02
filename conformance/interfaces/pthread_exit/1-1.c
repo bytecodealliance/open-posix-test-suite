@@ -33,6 +33,7 @@ int sem;	/* Manual semaphore used to indicate when the thread has been created. 
 /* Thread's function. */
 void *a_thread_func(void* arg)
 {
+	(void)arg;
 	sem=INMAIN;
 	pthread_exit((void*)RETURN_CODE);
 	return NULL;

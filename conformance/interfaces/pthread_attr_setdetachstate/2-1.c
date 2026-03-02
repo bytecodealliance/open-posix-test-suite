@@ -27,6 +27,7 @@
 
 void *a_thread_func(void* arg)
 {
+	(void)arg;
 	return NULL;
 }
 

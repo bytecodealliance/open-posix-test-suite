@@ -33,6 +33,7 @@ int i;
 /* Thread function that sets the key to KEY_VALUE */
 void *a_thread_func(void* arg)
 {
+	(void)arg;
 	/* Set the key to KEY_VALUE */
 	if(pthread_setspecific(keys[i], (void *)(KEY_VALUE)) != 0)
 	{

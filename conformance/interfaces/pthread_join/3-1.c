@@ -40,6 +40,7 @@ void a_cleanup_func()
 /* Thread's function. */
 void *a_thread_func(void* arg)
 {
+	(void)arg;
 	pthread_setcancelstate(PTHREAD_CANCEL_ENABLE, NULL);
 	pthread_setcanceltype(PTHREAD_CANCEL_DEFERRED, NULL);
 	

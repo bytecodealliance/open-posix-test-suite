@@ -94,7 +94,6 @@ static void* fn_wr_1(void *arg)
 		exit(PTS_UNRESOLVED);
 	}	
 	thread_state = EXITING_THREAD;
-	pthread_exit(0);
 	return NULL;
 }
  
@@ -146,7 +145,6 @@ static void* fn_wr_2(void *arg)
 		exit(PTS_UNRESOLVED);
 	}	
 	thread_state = EXITING_THREAD;
-	pthread_exit(0);
 	return NULL;
 }
 

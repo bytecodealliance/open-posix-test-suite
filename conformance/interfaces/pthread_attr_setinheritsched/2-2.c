@@ -55,7 +55,6 @@ void *thread_func(void* arg)
                         "not be inherited from creating thread \n");
 		exit(PTS_FAIL);
 	}		
-	pthread_exit(0);
 	return NULL;
 }
 int main()

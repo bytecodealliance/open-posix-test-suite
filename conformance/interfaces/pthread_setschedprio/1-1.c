@@ -71,7 +71,6 @@ void *a_thread_func()
 		printf("Priority is not set correctly\n");
 		exit(PTS_FAIL);
 	}
-	pthread_exit(0);
 	return NULL;
 }
 

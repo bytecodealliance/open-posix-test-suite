@@ -39,6 +39,7 @@ int teststack() {
 }
 void *thread_func(void* arg)
 {
+	(void)arg;
 	/* execute a function to test the read/right of the stack*/
 	if (teststack() != 0) {
 		perror(ERROR_PREFIX "stack wrong");

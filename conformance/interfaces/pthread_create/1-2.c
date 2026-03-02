@@ -23,12 +23,12 @@
 
 void *a_thread_func(void* arg)
 {
+	(void)arg;
 	sleep(10);
 
 	/* Shouldn't reach here.  If we do, then the pthread_cancel()
 	 * function did not succeed. */
 	perror("Could not send cancel request correctly\n");
-	pthread_exit(0);
 	return NULL;
 }
 

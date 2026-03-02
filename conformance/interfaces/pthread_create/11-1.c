@@ -24,6 +24,7 @@
 
 void *a_thread_func(void* arg)
 {
+	(void)arg;
 	clockid_t cpuclock;
 	struct timespec ts = {.tv_sec = 1, .tv_nsec = 1};
 	pthread_getcpuclockid(pthread_self(), &cpuclock);
