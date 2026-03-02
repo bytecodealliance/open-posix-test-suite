@@ -403,9 +403,6 @@ int main (int argc, char * argv[])
 			if (ret != 0)  {  UNRESOLVED(ret, "[parent] Unable to set the monotonic clock for the cond");  }
 		}
 		ret = pthread_condattr_getclock(&ca, &td->cid);
-		printf("Clock id used in cond var: %p\n", td->cid);
-		printf("CLOCK_MONOTONIC: %p\n", CLOCK_MONOTONIC);
-		printf("CLOCK_REALTIME: %p\n", CLOCK_REALTIME);
 		if (ret != 0)  {  UNRESOLVED(ret, "Unable to get clock from cond attr");  }
 		#else
 		td->cid = CLOCK_REALTIME;
