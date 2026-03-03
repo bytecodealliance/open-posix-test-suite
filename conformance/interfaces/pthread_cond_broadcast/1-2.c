@@ -351,7 +351,7 @@ int main (int argc, char * argv[])
 	else
 	{
 		#ifdef __wasi__
-		FAILED("WASI does not support memory mapping, which is required for this test");
+		UNRESOLVED(-1, "WASI does not support memory mapping, which is required for this test");
 		#else
 		/* We will place the test data in a mmaped file */
 		char filename[] = "/tmp/cond_broadcast-XXXXXX";
@@ -515,7 +515,7 @@ int main (int argc, char * argv[])
 		else
 		{
 			#ifdef __wasi__
-			FAILED("WASI does not support forking, which is required for this test");
+			UNRESOLVED(-1, "WASI does not support forking, which is required for this test");
 			#else
 			do
 			{
@@ -606,7 +606,7 @@ int main (int argc, char * argv[])
 			else
 			{
 				#ifdef __wasi__
-				FAILED("WASI does not support forking, which is required for this test");
+				UNRESOLVED(-1, "WASI does not support forking, which is required for this test");
 				#else
 				pid = waitpid(tmp->data.p, &status, 0);
 				if (pid != tmp->data.p)

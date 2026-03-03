@@ -335,7 +335,7 @@ int main (int argc, char * argv[])
 	{
 		// WASI-CHANGE: No mmap support
 		#ifdef __wasi__
-		FAILED("WASI does not support memory mapping, which is required for this test");
+		UNRESOLVED(-1, "WASI does not support memory mapping, which is required for this test");
 		#else
 		/* We will place the test data in a mmaped file */
 		char filename[] = "/tmp/cond_broadcast-XXXXXX";
@@ -468,7 +468,7 @@ int main (int argc, char * argv[])
 			else
 			{
 				#ifdef __wasi__
-				FAILED("WASI does not support forking, which is required for this test");
+				UNRESOLVED(-1, "WASI does not support forking, which is required for this test");
 				#else
 				children.ch[children.nb].p=fork();
 				if (children.ch[children.nb].p == 0) /* We are the child */
@@ -537,7 +537,7 @@ int main (int argc, char * argv[])
 			else
 			{
 				#ifdef __wasi__
-				FAILED("WASI does not support forking, which is required for this test");
+				UNRESOLVED(-1, "WASI does not support forking, which is required for this test");
 				#else
 				pid = waitpid(children.ch[children.nb].p, &status, 0);
 				if (pid != children.ch[children.nb].p)

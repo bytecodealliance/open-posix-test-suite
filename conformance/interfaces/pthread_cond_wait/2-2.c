@@ -296,7 +296,7 @@ int main(int argc, char * argv[])
 	{
 		// WASI-CHANGE: We don't support mmap, so we won't do this testing anyway
 		#ifdef __wasi__
-		FAILED("WASI does not support memory mapping, which is required for this test scenario");
+		UNRESOLVED(-1, "WASI does not support memory mapping, which is required for this test scenario");
 		#else
 		/* We will place the test data in a mmaped file */
 		char filename[] = "/tmp/cond_wait_2-2-XXXXXX";
@@ -370,7 +370,7 @@ int main(int argc, char * argv[])
 		if ((pshared > 0) && (scenarii[i].mc_pshared != 0))
 		{
 			#ifdef __wasi__
-			FAILED("WASI does not support process-shared mutexes and condition variables, which"
+			UNRESOLVED(-1, "WASI does not support process-shared mutexes and condition variables, which"
 					 " are required for this test scenario");
 			#else
 			ret = pthread_mutexattr_setpshared(&ma, PTHREAD_PROCESS_SHARED);
@@ -458,7 +458,7 @@ int main(int argc, char * argv[])
 		if (do_fork != 0)
 		{
 			#ifdef __wasi__
-			FAILED("WASI does not support processes, which are required for this test scenario");
+			UNRESOLVED(-1, "WASI does not support processes, which are required for this test scenario");
 			#else
 			/* We are testing across two processes */
 			child_pr = fork();
@@ -538,7 +538,7 @@ int main(int argc, char * argv[])
 		if (do_fork != 0)
 		{
 			#ifdef __wasi__
-			FAILED("WASI does not support processes, which are required for this test scenario");
+			UNRESOLVED(-1, "WASI does not support processes, which are required for this test scenario");
 			#else
 			/* We were testing across two processes */
 			chkpid = waitpid(child_pr, &status, 0);
