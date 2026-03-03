@@ -25,7 +25,7 @@
 
 void *a_thread_func(void *attr)
 {
-	pthread_exit(NULL);
+	(void)attr;
 	return NULL;
 }
 

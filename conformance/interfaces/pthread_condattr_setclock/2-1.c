@@ -27,7 +27,7 @@
 #include <errno.h>
 #include "posixtest.h"
 
-#define INVALID_CLOCKID -100
+#define INVALID_CLOCKID NULL
 
 int main()
 {
