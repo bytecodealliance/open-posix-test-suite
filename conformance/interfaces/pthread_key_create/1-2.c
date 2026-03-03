@@ -38,9 +38,9 @@ void *a_thread_func(void* arg)
 	if(pthread_setspecific(keys[i], (void *)(KEY_VALUE)) != 0)
 	{
 		printf("Error: pthread_setspecific() failed\n");
-		pthread_exit((void*)PTS_FAIL);
+		return (void*)PTS_FAIL;
 	}
-
+	return (void*)PTS_PASS;
 }
 
 int main()
