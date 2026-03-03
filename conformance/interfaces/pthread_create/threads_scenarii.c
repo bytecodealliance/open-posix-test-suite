@@ -75,6 +75,7 @@ struct __scenario
   *
   */
 
+// WASI-CHANGE: We don't support scheduling policies or stack guards
 {
    /* Unary tests */
 /* 0*/	 CASE_POS( 0, 0, 0, 0, 0, 0, 0, 0, "default")
@@ -124,6 +125,7 @@ struct __scenario
 	,CASE_UNK( 1, 1, 1,-1, 1, 0, 0, 0, "Detached, explicit FIFO min param, alt scope")
 	,CASE_UNK( 1, 1, 2,-1, 1, 0, 0, 0, "Detached, explicit RR min param, alt scope")
 #endif
+
 };
 
 #define NSCENAR (sizeof(scenarii) / sizeof(scenarii[0]))
@@ -152,6 +154,7 @@ void scenar_init()
 	output(" min stack size: %li\n", minstacksize);
 	#endif
 	
+	// WASI-CHANGE: This is fine on WASI
 	#ifndef __wasi__
 	if (minstacksize % pagesize)
 	{
@@ -187,6 +190,9 @@ void scenar_init()
 		/* Sched related attributes */
 		if (tps>0) /* This routine is dependent on the Thread Execution Scheduling option */
 		{
+			#ifdef __wasi__
+			FAILED("Scheduling policies are not supported on WASI");
+			#else
 			if (scenarii[i].explicitsched == 1)
 				ret = pthread_attr_setinheritsched(&scenarii[i].ta, PTHREAD_EXPLICIT_SCHED);
 			else
@@ -194,6 +200,7 @@ void scenar_init()
 			if (ret != 0)  {  UNRESOLVED(ret, "Unable to set inheritsched attribute");  }
 			#if VERBOSE > 4
 			output("inheritsched state was set sucessfully\n");
+			#endif
 			#endif
 		}
 		#if VERBOSE > 4
@@ -203,7 +210,9 @@ void scenar_init()
 		
 		if (tps>0) /* This routine is dependent on the Thread Execution Scheduling option */
 		{
-		#ifndef __wasi__
+			#ifdef __wasi__
+			FAILED("Scheduling policies are not supported on WASI");
+			#else
 			if (scenarii[i].schedpolicy == 1)
 			{
 				ret = pthread_attr_setschedpolicy(&scenarii[i].ta, SCHED_FIFO);
@@ -219,7 +228,7 @@ void scenar_init()
 			else
 				output("Sched policy untouched\n");
 			#endif
-		#endif
+			#endif
 		}
 		#if VERBOSE > 4
 		else
@@ -228,7 +237,9 @@ void scenar_init()
 		
 		if (scenarii[i].schedparam != 0)
 		{
-		#ifndef __wasi__
+			#ifdef __wasi__
+			FAILED("Scheduling policies are not supported on WASI");
+			#else
 			struct sched_param sp;
 			
 			ret = pthread_attr_getschedpolicy(&scenarii[i].ta, &old);
@@ -244,15 +255,21 @@ void scenar_init()
 		#endif
 		#if VERBOSE > 4
 			output("Sched param was set sucessfully to %i\n", sp.sched_priority);
+		#endif
+			#endif
 		}
+		#if VERBOSE > 4
 		else
 		{
 			output("Sched param untouched\n");
-		#endif
 		}
+		#endif
 		
 		if (tps>0) /* This routine is dependent on the Thread Execution Scheduling option */
 		{
+			#ifdef __wasi__
+			FAILED("Scheduling policies are not supported on WASI");
+			#else
 			ret = pthread_attr_getscope(&scenarii[i].ta, &old);
 			if (ret != 0)  {  UNRESOLVED(ret, "Failed to get contension scope from thread attribute");  }
 			
@@ -275,6 +292,7 @@ void scenar_init()
 				output("Contension scope untouched (%s)\n", old==PTHREAD_SCOPE_PROCESS?"PTHREAD_SCOPE_PROCESS":"PTHREAD_SCOPE_SYSTEM");
 			#endif
 			}
+			#endif
 		}
 		#if VERBOSE > 4
 		else
@@ -309,6 +327,9 @@ void scenar_init()
 		#ifndef WITHOUT_XOPEN
 		if (scenarii[i].guard != 0)
 		{
+			#ifdef __wasi__
+			FAILED("Stack guards are not supported on WASI");
+			#else
 			if (scenarii[i].guard == 1)
 				ret = pthread_attr_setguardsize(&scenarii[i].ta, 0);
 			if (scenarii[i].guard == 2)
@@ -316,6 +337,7 @@ void scenar_init()
 			if (ret != 0)  {  UNRESOLVED(ret, "Unable to set guard area size in thread stack");  }
 			#if VERBOSE > 4
 			output("Guard size set to %i\n", (scenarii[i].guard==1)?1:pagesize);
+			#endif
 			#endif
 		}
 		#endif
