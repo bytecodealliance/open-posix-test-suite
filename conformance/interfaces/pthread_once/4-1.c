@@ -11,8 +11,11 @@
   */
 
 #include <pthread.h>
+#include "posixtest.h"
 
 pthread_once_t dummy = PTHREAD_ONCE_INIT;
 
-int main() {}
+int main() {
+  return PTS_PASS;
+}
 
