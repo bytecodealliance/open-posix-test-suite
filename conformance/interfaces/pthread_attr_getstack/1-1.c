@@ -54,7 +54,7 @@ int main()
 		exit(PTS_UNRESOLVED);
 	}
 	printf("stack_addr = %p, stack_size = %zu\n", stack_addr, stack_size);
-	#endif 
+	#endif
 
 	stack_size = PTHREAD_STACK_MIN;
 
