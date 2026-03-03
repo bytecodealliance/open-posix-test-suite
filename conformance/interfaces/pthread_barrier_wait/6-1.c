@@ -17,23 +17,29 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
-#include <signal.h>
 #include <errno.h>
 #include <string.h>
 #include "posixtest.h"
 
 int rc;
 
+// WASI-CHANGE: Instead of sending a SIGALRM, we'll just timeout in ctest 
+// if the main thread blocks.
+#ifndef __wasi__
 void sig_handler()
 {
 	printf("main: blocked on barrier wait with an un-initializied barrier object.\n");
 	printf("Test PASSED: Note*: Expected EINVAL when calling this funtion with an un-initialized barrier object, but standard says 'may' fail.\n");
 	exit(PTS_PASS);
 }
+#endif
 
 int main()
 {
 	pthread_barrier_t barrier;
+
+	// WASI-CHANGE: No SIGALRM
+	#ifndef __wasi__
 	struct sigaction act;	
 
 	/* Set up main thread to handle SIGALRM */
@@ -41,14 +47,12 @@ int main()
 	act.sa_handler = sig_handler;
 	sigfillset(&act.sa_mask);
 	sigaction(SIGALRM, &act, 0);
+	#endif
 
 	/* Intialize return code */
 	rc = 1;	
 	
 	/* Call pthread_barrier_wait while refering to an un-initialized barrier object */
-	
-	/* Just in case we are blocked, send a SIGALRM after 2 sec. */
-	alarm(2);
 	
 	rc = pthread_barrier_wait(&barrier);
 	
