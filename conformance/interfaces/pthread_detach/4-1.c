@@ -27,10 +27,20 @@
 #include <unistd.h>
 #include "posixtest.h"
 
+int ready_to_exit = 0;
+
 /* Thread function */
 void *a_thread_func(void* arg)
 {
 	(void)arg;
+	// WASI-CHANGE: Rather than cancelling, we'll wait on a bool to let the thread know it can exit
+	#ifdef __wasi__
+	while (!ready_to_exit)
+	{
+		sched_yield();
+	}
+	return NULL;
+	#else
 	pthread_setcanceltype(PTHREAD_CANCEL_ASYNCHRONOUS, NULL);
 
 	/* If the thread wasn't canceled in 10 seconds, time out */
@@ -38,6 +48,7 @@ void *a_thread_func(void* arg)
 
 	perror("Thread couldn't be canceled (at cleanup time), timing out\n");
 	return NULL;
+	#endif
 }
 
 int main()
@@ -70,8 +81,14 @@ int main()
 	/* Detach the thread. */
 	ret=pthread_detach(new_th);
 
+	// WASI-CHANGE: Instead of cancelling, we'll set a bool to let the thread know it can exit
+	#ifdef __wasi__
+	ready_to_exit = 1;
+	sched_yield();
+	#else
 	/* Cleanup and cancel the thread */	
 	pthread_cancel(new_th);
+	#endif
 
 	/* Check return value of pthread_detach() */
 	if(ret != EINVAL)
