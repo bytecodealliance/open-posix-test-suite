@@ -42,14 +42,13 @@ void *a_thread_func(void* arg)
 	if(pthread_setspecific(key, (void *)(KEY_VALUE_2)) != 0)
 	{
 		printf("Test FAILED: Could not set the value of the key to %d\n", (KEY_VALUE_2));
-		pthread_exit((void*)PTS_FAIL);
-		return NULL;
+		return (void*)PTS_FAIL;
 	}
 
 	/* Get the bound value of the key that we just set. */
 	rc2 = pthread_getspecific(key);
 
-	return NULL;
+	return (void*)PTS_PASS;
 
 }
 
@@ -79,7 +78,13 @@ int main()
 	}
 			
 	/* Wait for thread to end execution */
-	pthread_join(new_th, NULL);
+	void* thread_ret;
+	pthread_join(new_th, &thread_ret);
+	if(thread_ret != (void*)PTS_PASS)
+	{
+		printf("Test FAILED: Thread did not return PASS\n");
+		return PTS_FAIL;
+	}
 
 	/* Get the value associated for the key in this main thread */
 	rc1 = pthread_getspecific(key);
