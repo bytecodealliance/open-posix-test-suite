@@ -36,13 +36,13 @@
 
 int NUM_OF_KEYS = PTHREAD_KEYS_MAX;
 
-static pthread_key_t keys[5];
+static pthread_key_t keys[PTHREAD_KEYS_MAX + 1];
 
 int main()
 {
 	int i, rc;
 
-	for(i = 0;i<=NUM_OF_KEYS;i++)
+	for(i = 0;i<NUM_OF_KEYS;i++)
 	{
 		rc = pthread_key_create(&keys[i], NULL);
 		if(i == NUM_OF_KEYS)
@@ -66,6 +66,14 @@ int main()
 				return PTS_FAIL;
 			}
 		}
+	}
+
+	// WASI-CHANGE: extra test to ensure we do reach the limit
+	rc = pthread_key_create(&keys[NUM_OF_KEYS], NULL);
+	if (rc != EAGAIN)
+	{
+		printf("Test FAILED: Expected EAGAIN when exceeded the limit of keys in a single process, but got: %d\n", rc);
+		return PTS_FAIL;
 	}
 
 	printf("Test PASSED\n");
