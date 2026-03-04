@@ -52,8 +52,6 @@
  #include <unistd.h>
 
  #include <errno.h>
- #include <sys/wait.h>
- #include <sys/mman.h>
  #include <string.h>
  
 /********************************************************************************************/
@@ -121,6 +119,8 @@ scenarii[] =
 	,{PTHREAD_MUTEX_ERRORCHECK, 0, 0, 0, "Errorcheck mutex"}
 	,{PTHREAD_MUTEX_RECURSIVE,  0, 0, 0, "Recursive mutex"}
 
+// WASI-CHANGE: We don't support processes, so don't need these
+#ifndef __wasi__
 	,{PTHREAD_MUTEX_DEFAULT,    1, 0, 0, "PShared default mutex"}
 	,{PTHREAD_MUTEX_NORMAL,     1, 0, 0, "Pshared normal mutex"}
 	,{PTHREAD_MUTEX_ERRORCHECK, 1, 0, 0, "Pshared errorcheck mutex"}
@@ -130,22 +130,27 @@ scenarii[] =
 	,{PTHREAD_MUTEX_NORMAL,     1, 0, 1, "Pshared normal mutex across processes"}
 	,{PTHREAD_MUTEX_ERRORCHECK, 1, 0, 1, "Pshared errorcheck mutex across processes"}
 	,{PTHREAD_MUTEX_RECURSIVE,  1, 0, 1, "Pshared recursive mutex across processes"}
+#endif
 
 #ifdef USE_ALTCLK
+	#ifndef __wasi__
 	,{PTHREAD_MUTEX_DEFAULT,    1, 1, 1, "Pshared default mutex and alt clock condvar across processes"}
 	,{PTHREAD_MUTEX_NORMAL,     1, 1, 1, "Pshared normal mutex and alt clock condvar across processes"}
 	,{PTHREAD_MUTEX_ERRORCHECK, 1, 1, 1, "Pshared errorcheck mutex and alt clock condvar across processes"}
 	,{PTHREAD_MUTEX_RECURSIVE,  1, 1, 1, "Pshared recursive mutex and alt clock condvar across processes"}
+	#endif
 
 	,{PTHREAD_MUTEX_DEFAULT,    0, 1, 0, "Default mutex and alt clock condvar"}
 	,{PTHREAD_MUTEX_NORMAL,     0, 1, 0, "Normal mutex and alt clock condvar"}
 	,{PTHREAD_MUTEX_ERRORCHECK, 0, 1, 0, "Errorcheck mutex and alt clock condvar"}
 	,{PTHREAD_MUTEX_RECURSIVE,  0, 1, 0, "Recursive mutex and alt clock condvar"}
 
+	#ifndef __wasi__
 	,{PTHREAD_MUTEX_DEFAULT,    1, 1, 0, "PShared default mutex and alt clock condvar"}
 	,{PTHREAD_MUTEX_NORMAL,     1, 1, 0, "Pshared normal mutex and alt clock condvar"}
 	,{PTHREAD_MUTEX_ERRORCHECK, 1, 1, 0, "Pshared errorcheck mutex and alt clock condvar"}
 	,{PTHREAD_MUTEX_RECURSIVE,  1, 1, 0, "Pshared recursive mutex and alt clock condvar"}
+	#endif
 #endif
 };
 
@@ -251,7 +256,7 @@ int main(int argc, char * argv[])
 	pshared = sysconf(_SC_THREAD_PROCESS_SHARED);
 	cs = sysconf(_SC_CLOCK_SELECTION);
 	monotonic = sysconf(_SC_MONOTONIC_CLOCK);
-	mf =sysconf(_SC_MAPPED_FILES);
+	mf = -1; //WASI-CHANGE: force no mmap
 	
 	#if VERBOSE > 0
 	output("Test starting\n");
@@ -289,6 +294,10 @@ int main(int argc, char * argv[])
 	}
 	else
 	{
+		// WASI-CHANGE: We don't support mmap, so we won't do this testing anyway
+		#ifdef __wasi__
+		UNRESOLVED(-1, "WASI does not support memory mapping, which is required for this test scenario");
+		#else
 		/* We will place the test data in a mmaped file */
 		char filename[] = "/tmp/cond_wait_2-2-XXXXXX";
 		size_t sz;
@@ -331,6 +340,7 @@ int main(int argc, char * argv[])
 		#if VERBOSE > 1
 		output("Testdata allocated in shared memory.\n");
 		#endif
+		#endif
 	}
 	
 	
@@ -359,12 +369,17 @@ int main(int argc, char * argv[])
 		/* Set the pshared attributes, if supported */
 		if ((pshared > 0) && (scenarii[i].mc_pshared != 0))
 		{
+			#ifdef __wasi__
+			UNRESOLVED(-1, "WASI does not support process-shared mutexes and condition variables, which"
+					 " are required for this test scenario");
+			#else
 			ret = pthread_mutexattr_setpshared(&ma, PTHREAD_PROCESS_SHARED);
 			if (ret != 0)  {  UNRESOLVED(ret, "[parent] Unable to set the mutex process-shared");  }
 			ret = pthread_condattr_setpshared(&ca, PTHREAD_PROCESS_SHARED);
 			if (ret != 0)  {  UNRESOLVED(ret, "[parent] Unable to set the cond var process-shared");  }
 			#if VERBOSE > 1
 			output("[parent] Mutex & cond are process-shared\n");
+			#endif
 			#endif
 		}
 		#if VERBOSE > 1
@@ -442,6 +457,9 @@ int main(int argc, char * argv[])
 		/* Create the child */
 		if (do_fork != 0)
 		{
+			#ifdef __wasi__
+			UNRESOLVED(-1, "WASI does not support processes, which are required for this test scenario");
+			#else
 			/* We are testing across two processes */
 			child_pr = fork();
 			if (child_pr == -1)
@@ -464,6 +482,7 @@ int main(int argc, char * argv[])
 				}
 			}
 			/* Only the parent process goes further */
+			 #endif
 		}
 		else /* do_fork == 0 */
 		{
@@ -518,6 +537,9 @@ int main(int argc, char * argv[])
 		/* Wait for the child to terminate */
 		if (do_fork != 0)
 		{
+			#ifdef __wasi__
+			UNRESOLVED(-1, "WASI does not support processes, which are required for this test scenario");
+			#else
 			/* We were testing across two processes */
 			chkpid = waitpid(child_pr, &status, 0);
 			if (chkpid != child_pr)
@@ -544,6 +566,7 @@ int main(int argc, char * argv[])
 			{
 				exit(ret); /* Output has already been closed in child */
 			}
+			#endif
 		}
 		else /* child was a thread */
 		{

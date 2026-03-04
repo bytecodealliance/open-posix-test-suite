@@ -46,11 +46,8 @@
  #include <unistd.h>
 
  #include <errno.h>
- #include <signal.h>
  #include <string.h>
  #include <time.h>
- #include <sys/mman.h>
- #include <sys/wait.h>
  #include <semaphore.h>
  
 /********************************************************************************************/
@@ -75,6 +72,9 @@
   * 
   * Those may be used to output information.
   */
+
+// WASI-CHANGE: We don't support forking, so don't need these
+#ifndef __wasi__
 #define UNRESOLVED_KILLALL(error, text) { \
 	if (td->fork) \
 	{ \
@@ -103,6 +103,8 @@
 	} \
 	FAILED(text); \
 	}
+#endif
+
 /********************************************************************************************/
 /********************************** Configuration ******************************************/
 /********************************************************************************************/
@@ -149,6 +151,8 @@ scenarii[] =
 	,{PTHREAD_MUTEX_ERRORCHECK, 0, 0, 0, "Errorcheck mutex"}
 	,{PTHREAD_MUTEX_RECURSIVE,  0, 0, 0, "Recursive mutex"}
 
+	// WASI-CHANGE: We don't support processes, so don't need these
+	#ifndef __wasi__
 	,{PTHREAD_MUTEX_DEFAULT,    1, 0, 0, "PShared default mutex"}
 	,{PTHREAD_MUTEX_NORMAL,     1, 0, 0, "Pshared normal mutex"}
 	,{PTHREAD_MUTEX_ERRORCHECK, 1, 0, 0, "Pshared errorcheck mutex"}
@@ -158,22 +162,27 @@ scenarii[] =
 	,{PTHREAD_MUTEX_NORMAL,     1, 0, 1, "Pshared normal mutex across processes"}
 	,{PTHREAD_MUTEX_ERRORCHECK, 1, 0, 1, "Pshared errorcheck mutex across processes"}
 	,{PTHREAD_MUTEX_RECURSIVE,  1, 0, 1, "Pshared recursive mutex across processes"}
+	#endif
 
 #ifdef USE_ALTCLK
+	#ifndef __wasi__
 	,{PTHREAD_MUTEX_DEFAULT,    1, 1, 1, "Pshared default mutex and alt clock condvar across processes"}
 	,{PTHREAD_MUTEX_NORMAL,     1, 1, 1, "Pshared normal mutex and alt clock condvar across processes"}
 	,{PTHREAD_MUTEX_ERRORCHECK, 1, 1, 1, "Pshared errorcheck mutex and alt clock condvar across processes"}
 	,{PTHREAD_MUTEX_RECURSIVE,  1, 1, 1, "Pshared recursive mutex and alt clock condvar across processes"}
+	#endif
 
 	,{PTHREAD_MUTEX_DEFAULT,    0, 1, 0, "Default mutex and alt clock condvar"}
 	,{PTHREAD_MUTEX_NORMAL,     0, 1, 0, "Normal mutex and alt clock condvar"}
 	,{PTHREAD_MUTEX_ERRORCHECK, 0, 1, 0, "Errorcheck mutex and alt clock condvar"}
 	,{PTHREAD_MUTEX_RECURSIVE,  0, 1, 0, "Recursive mutex and alt clock condvar"}
 
+	#ifndef __wasi__
 	,{PTHREAD_MUTEX_DEFAULT,    1, 1, 0, "PShared default mutex and alt clock condvar"}
 	,{PTHREAD_MUTEX_NORMAL,     1, 1, 0, "Pshared normal mutex and alt clock condvar"}
 	,{PTHREAD_MUTEX_ERRORCHECK, 1, 1, 0, "Pshared errorcheck mutex and alt clock condvar"}
 	,{PTHREAD_MUTEX_RECURSIVE,  1, 1, 0, "Pshared recursive mutex and alt clock condvar"}
+	#endif
 #endif
 };
 #define NSCENAR (sizeof(scenarii)/sizeof(scenarii[0]))
@@ -268,7 +277,7 @@ void * timer(void * arg)
 	
 	do { to = sleep(to); }
 	while (to>0);
-	FAILED_KILLALL("Operation timed out. A signal was lost."); 
+	FAILED("Operation timed out. A signal was lost."); 
 	return NULL; /* For compiler */
 }
 
@@ -341,6 +350,9 @@ int main (int argc, char * argv[])
 	}
 	else
 	{
+		#ifdef __wasi__
+		UNRESOLVED(-1, "WASI does not support memory mapping, which is required for this test");
+		#else
 		/* We will place the test data in a mmaped file */
 		char filename[] = "/tmp/cond_broadcast-XXXXXX";
 		size_t sz, ps;
@@ -383,6 +395,7 @@ int main (int argc, char * argv[])
 		/* Our datatest structure is now in shared memory */
 		#if VERBOSE > 1
 		output("Testdata allocated in shared memory (%ib).\n", sizeof(testdata_t));
+		#endif
 		#endif
 	}
 	
@@ -465,7 +478,7 @@ int main (int argc, char * argv[])
 		
 		/* create the timeout thread */
 		ret = pthread_create(&t_timer, NULL, timer, NULL);
-		if (ret != 0)  {  UNRESOLVED_KILLALL(ret, "Unable to create timer thread");  }
+		if (ret != 0)  {  UNRESOLVED(ret, "Unable to create timer thread");  }
 		
 		/* Create all the children */
 		if (td->fork==0)
@@ -501,6 +514,9 @@ int main (int argc, char * argv[])
 		}
 		else
 		{
+			#ifdef __wasi__
+			UNRESOLVED(-1, "WASI does not support forking, which is required for this test");
+			#else
 			do
 			{
 				tmp=(children_t *)malloc(sizeof(children_t));
@@ -536,20 +552,20 @@ int main (int argc, char * argv[])
 			#endif
 			if (child_count==0)
 			{  UNRESOLVED(ret, "Unable to create any process");  }
-				
+			#endif
 		}
 		
 		/* Make sure all children are waiting */
 		ret = pthread_mutex_lock(&td->mtx);
-		if (ret != 0) {  UNRESOLVED_KILLALL(ret, "Failed to lock mutex");  }
+		if (ret != 0) {  UNRESOLVED(ret, "Failed to lock mutex");  }
 		ch = td->count;
 		while (ch < child_count)
 		{
 			ret = pthread_mutex_unlock(&td->mtx);
-			if (ret != 0)  {  UNRESOLVED_KILLALL(ret, "Failed to unlock mutex");  }
+			if (ret != 0)  {  UNRESOLVED(ret, "Failed to unlock mutex");  }
 			sched_yield();
 			ret = pthread_mutex_lock(&td->mtx);
-			if (ret != 0) {  UNRESOLVED_KILLALL(ret, "Failed to lock mutex");  }
+			if (ret != 0) {  UNRESOLVED(ret, "Failed to lock mutex");  }
 			ch = td->count;
 		}
 		
@@ -560,19 +576,19 @@ int main (int argc, char * argv[])
 		/* start the timer count */
 		do {  ret = sem_post(&sem_tmr);  }
 		while ((ret != 0) && (errno == EINTR)); 
-		if (ret != 0)  {  UNRESOLVED_KILLALL(errno, "Failed to post the semaphore.");  }
+		if (ret != 0)  {  UNRESOLVED(errno, "Failed to post the semaphore.");  }
 		
 		/* Wakeup the children */
 		td->predicate=1;
 		ret = pthread_cond_broadcast(&td->cnd);
-		if (ret != 0)  {  UNRESOLVED_KILLALL(ret, "Failed to broadcast the condition.");  }
+		if (ret != 0)  {  UNRESOLVED(ret, "Failed to broadcast the condition.");  }
 
 		#if VERBOSE > 4
 		output("[parent] Condition was signaled\n");
 		#endif
 		
 		ret = pthread_mutex_unlock(&td->mtx);
-		if (ret != 0)  {  UNRESOLVED_KILLALL(ret, "Failed to unlock mutex");  }
+		if (ret != 0)  {  UNRESOLVED(ret, "Failed to unlock mutex");  }
 		
 		#if VERBOSE > 4
 		output("[parent] Joining the children\n");
@@ -589,13 +605,16 @@ int main (int argc, char * argv[])
 			}
 			else
 			{
+				#ifdef __wasi__
+				UNRESOLVED(-1, "WASI does not support forking, which is required for this test");
+				#else
 				pid = waitpid(tmp->data.p, &status, 0);
 				if (pid != tmp->data.p)
 				{
 					ret = errno;
 					output("Waitpid failed (expected: %i, got: %i)\n", tmp->data.p, pid);
 					free(tmp);
-					UNRESOLVED_KILLALL(ret, "Waitpid failed");
+					UNRESOLVED(ret, "Waitpid failed");
 				}
 				if (WIFEXITED(status))
 				{
@@ -603,6 +622,7 @@ int main (int argc, char * argv[])
 					if (ret != PTS_FAIL)
 						ret |= WEXITSTATUS(status);
 				}
+				#endif
 			}
 			free(tmp);
 		}

@@ -16,7 +16,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
-#include <signal.h>
 #include "posixtest.h"
 
 #define THREAD_NUM  3
@@ -32,6 +31,8 @@ pthread_t  thread[THREAD_NUM];
 int start_num = 0;
 int waken_num = 0;
 
+// WASI-CHANGE: This is just used as a timeout mechanism; we'll use ctest for this
+#ifndef __wasi__
 /* Alarm handler */
 void alarm_handler(int signo)
 {
@@ -43,6 +44,7 @@ void alarm_handler(int signo)
 
 	exit(PTS_UNRESOLVED);
 }
+#endif
 
 void *thr_func(void *arg)
 {
@@ -76,7 +78,6 @@ void *thr_func(void *arg)
 int main()
 {
 	int i, rc;
-	struct sigaction act;
 
 	if (pthread_mutex_init(&td.mutex, NULL) != 0) {
 		fprintf(stderr,"Fail to initialize mutex\n");
@@ -118,20 +119,26 @@ int main()
 	if (waken_num <= 0){
 		fprintf(stderr,"[Main thread] but no waiters were wakened\n");
                 printf("Test FAILED\n");
+		// WASI-CHANGE: Unnecessary, just exit with failure
+		#ifndef __wasi__
 		/* Cancel the threads */
 		for (i=0; i<THREAD_NUM; i++) {	/* cancel threads */
 	    		pthread_cancel(thread[i]); 
 		}
+		#endif
                 exit(PTS_FAIL);
 	}	
 	fprintf(stderr,"[Main thread] %d waiters were wakened\n", waken_num);
 
+    // WASI-CHANGE: unnecessary, and we don't have signals
+#ifndef __wasi__
 	/* Setup alarm handler */
 	act.sa_handler=alarm_handler;
 	act.sa_flags=0;
 	sigemptyset(&act.sa_mask);
 	sigaction(SIGALRM, &act, 0);
 	alarm(5);
+#endif
 
 	/* loop to wake up the rest threads */
 	i=0;

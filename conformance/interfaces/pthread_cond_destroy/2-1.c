@@ -75,6 +75,8 @@
   * 
   * Those may be used to output information.
   */
+// WASI-CHANGE: We don't support forking, so don't need these
+#ifndef __wasi__
 #define UNRESOLVED_KILLALL(error, text, Tchild) { \
 	if (td->fork) \
 	{ \
@@ -93,6 +95,7 @@
 	} \
 	FAILED(text); \
 	}
+#endif
 /********************************************************************************************/
 /********************************** Configuration ******************************************/
 /********************************************************************************************/
@@ -137,6 +140,8 @@ scenarii[] =
 	,{PTHREAD_MUTEX_ERRORCHECK, 0, 0, 0, "Errorcheck mutex"}
 	,{PTHREAD_MUTEX_RECURSIVE,  0, 0, 0, "Recursive mutex"}
 
+// WASI-CHANGE: We don't support processes, so don't need these
+#ifndef __wasi__
 	,{PTHREAD_MUTEX_DEFAULT,    1, 0, 0, "PShared default mutex"}
 	,{PTHREAD_MUTEX_NORMAL,     1, 0, 0, "Pshared normal mutex"}
 	,{PTHREAD_MUTEX_ERRORCHECK, 1, 0, 0, "Pshared errorcheck mutex"}
@@ -147,22 +152,37 @@ scenarii[] =
 	,{PTHREAD_MUTEX_ERRORCHECK, 1, 0, 1, "Pshared errorcheck mutex across processes"}
 	,{PTHREAD_MUTEX_RECURSIVE,  1, 0, 1, "Pshared recursive mutex across processes"}
 
+	,{PTHREAD_MUTEX_DEFAULT,    1, 0, 0, "PShared default mutex"}
+	,{PTHREAD_MUTEX_NORMAL,     1, 0, 0, "Pshared normal mutex"}
+	,{PTHREAD_MUTEX_ERRORCHECK, 1, 0, 0, "Pshared errorcheck mutex"}
+	,{PTHREAD_MUTEX_RECURSIVE,  1, 0, 0, "Pshared recursive mutex"}
+
+	,{PTHREAD_MUTEX_DEFAULT,    1, 0, 1, "Pshared default mutex across processes"}
+	,{PTHREAD_MUTEX_NORMAL,     1, 0, 1, "Pshared normal mutex across processes"}
+	,{PTHREAD_MUTEX_ERRORCHECK, 1, 0, 1, "Pshared errorcheck mutex across processes"}
+	,{PTHREAD_MUTEX_RECURSIVE,  1, 0, 1, "Pshared recursive mutex across processes"}
+#endif
+
 #ifdef USE_ALTCLK
+#ifndef __wasi__
 	,{PTHREAD_MUTEX_DEFAULT,    1, 1, 1, "Pshared default mutex and alt clock condvar across processes"}
 	,{PTHREAD_MUTEX_NORMAL,     1, 1, 1, "Pshared normal mutex and alt clock condvar across processes"}
 	,{PTHREAD_MUTEX_ERRORCHECK, 1, 1, 1, "Pshared errorcheck mutex and alt clock condvar across processes"}
 	,{PTHREAD_MUTEX_RECURSIVE,  1, 1, 1, "Pshared recursive mutex and alt clock condvar across processes"}
+#endif
 
 	,{PTHREAD_MUTEX_DEFAULT,    0, 1, 0, "Default mutex and alt clock condvar"}
 	,{PTHREAD_MUTEX_NORMAL,     0, 1, 0, "Normal mutex and alt clock condvar"}
 	,{PTHREAD_MUTEX_ERRORCHECK, 0, 1, 0, "Errorcheck mutex and alt clock condvar"}
 	,{PTHREAD_MUTEX_RECURSIVE,  0, 1, 0, "Recursive mutex and alt clock condvar"}
 
+#ifndef __wasi__
 	,{PTHREAD_MUTEX_DEFAULT,    1, 1, 0, "PShared default mutex and alt clock condvar"}
 	,{PTHREAD_MUTEX_NORMAL,     1, 1, 0, "Pshared normal mutex and alt clock condvar"}
 	,{PTHREAD_MUTEX_ERRORCHECK, 1, 1, 0, "Pshared errorcheck mutex and alt clock condvar"}
 	,{PTHREAD_MUTEX_RECURSIVE,  1, 1, 0, "Pshared recursive mutex and alt clock condvar"}
 #endif
+	#endif
 };
 #define NSCENAR (sizeof(scenarii)/sizeof(scenarii[0]))
 
@@ -343,6 +363,10 @@ int main (int argc, char * argv[])
 	}
 	else
 	{
+		// WASI-CHANGE: We don't support processes, so we don't need to mmap a file
+		#ifdef __wasi__
+		UNRESOLVED(-1, "WASI does not support mmap, which is required for this test");
+		#else
 		/* We will place the test data in a mmaped file */
 		char filename[] = "/tmp/cond_destroy-XXXXXX";
 		size_t sz, ps;
@@ -386,6 +410,7 @@ int main (int argc, char * argv[])
 		#if VERBOSE > 1
 		output("Testdata allocated in shared memory (%ib).\n", sizeof(testdata_t));
 		#endif
+		#endif
 	}
 	
 	/* Do the test for each test scenario */
@@ -407,10 +432,15 @@ int main (int argc, char * argv[])
 		/* Set the pshared attributes, if supported */
 		if ((pshared > 0) && (scenarii[scenar].mc_pshared != 0))
 		{
+			#ifdef __wasi__
+			UNRESOLVED(-1, "WASI does not support process-shared synchronization primitives, which are required for
+				 this test scenario");
+			#else
 			ret = pthread_mutexattr_setpshared(&ma, PTHREAD_PROCESS_SHARED);
 			if (ret != 0)  {  UNRESOLVED(ret, "[parent] Unable to set the mutex process-shared");  }
 			ret = pthread_condattr_setpshared(&ca, PTHREAD_PROCESS_SHARED);
 			if (ret != 0)  {  UNRESOLVED(ret, "[parent] Unable to set the cond var process-shared");  }
+			#endif
 		}
 		
 		/* Set the alternative clock, if supported */
@@ -429,7 +459,12 @@ int main (int argc, char * argv[])
 		/* Tell whether the test will be across processes */
 		if ((pshared > 0) && (scenarii[scenar].fork != 0))
 		{
+			#ifdef __wasi__
+			UNRESOLVED(-1, "WASI does not support process-shared synchronization primitives, which are required for
+				 this test scenario");
+			#else
 			td->fork = 1;
+			#endif
 		}
 		
 		
@@ -467,6 +502,9 @@ int main (int argc, char * argv[])
 			}
 			else
 			{
+				#ifdef __wasi__
+				UNRESOLVED(-1, "WASI does not support forking, which is required for this test");
+				#else
 				p_child[ch]=fork();
 				if (p_child[ch] == -1)
 				{
@@ -481,6 +519,7 @@ int main (int argc, char * argv[])
 					child(NULL);
 					exit(0);
 				}
+				#endif
 			}
 		}
 		#if VERBOSE > 4
@@ -605,6 +644,9 @@ int main (int argc, char * argv[])
 			}
 			else
 			{
+				#ifdef __wasi__
+				UNRESOLVED(-1, "WASI does not support forking, which is required for this test");
+				#else
 				pid = waitpid(p_child[ch], &status, 0);
 				if (pid != p_child[ch])
 				{
@@ -622,6 +664,7 @@ int main (int argc, char * argv[])
 					if (ret != PTS_FAIL)
 						ret |= WEXITSTATUS(status);
 				}
+				#endif
 			}
 		}
 		if (ret != 0)
