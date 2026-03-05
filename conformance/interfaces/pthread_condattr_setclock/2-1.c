@@ -27,7 +27,11 @@
 #include <errno.h>
 #include "posixtest.h"
 
+#ifdef __wasi__
+#define INVALID_CLOCKID NULL
+#else
 #define INVALID_CLOCKID -100
+#endif
 
 int main()
 {

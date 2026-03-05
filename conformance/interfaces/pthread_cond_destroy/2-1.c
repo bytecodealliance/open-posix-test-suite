@@ -47,11 +47,8 @@
  #include <unistd.h>
 
  #include <errno.h>
- #include <signal.h>
  #include <string.h>
  #include <time.h>
- #include <sys/mman.h>
- #include <sys/wait.h>
  
 /********************************************************************************************/
 /******************************   Test framework   *****************************************/
@@ -151,16 +148,6 @@ scenarii[] =
 	,{PTHREAD_MUTEX_NORMAL,     1, 0, 1, "Pshared normal mutex across processes"}
 	,{PTHREAD_MUTEX_ERRORCHECK, 1, 0, 1, "Pshared errorcheck mutex across processes"}
 	,{PTHREAD_MUTEX_RECURSIVE,  1, 0, 1, "Pshared recursive mutex across processes"}
-
-	,{PTHREAD_MUTEX_DEFAULT,    1, 0, 0, "PShared default mutex"}
-	,{PTHREAD_MUTEX_NORMAL,     1, 0, 0, "Pshared normal mutex"}
-	,{PTHREAD_MUTEX_ERRORCHECK, 1, 0, 0, "Pshared errorcheck mutex"}
-	,{PTHREAD_MUTEX_RECURSIVE,  1, 0, 0, "Pshared recursive mutex"}
-
-	,{PTHREAD_MUTEX_DEFAULT,    1, 0, 1, "Pshared default mutex across processes"}
-	,{PTHREAD_MUTEX_NORMAL,     1, 0, 1, "Pshared normal mutex across processes"}
-	,{PTHREAD_MUTEX_ERRORCHECK, 1, 0, 1, "Pshared errorcheck mutex across processes"}
-	,{PTHREAD_MUTEX_RECURSIVE,  1, 0, 1, "Pshared recursive mutex across processes"}
 #endif
 
 #ifdef USE_ALTCLK
@@ -182,7 +169,7 @@ scenarii[] =
 	,{PTHREAD_MUTEX_ERRORCHECK, 1, 1, 0, "Pshared errorcheck mutex and alt clock condvar"}
 	,{PTHREAD_MUTEX_RECURSIVE,  1, 1, 0, "Pshared recursive mutex and alt clock condvar"}
 #endif
-	#endif
+#endif
 };
 #define NSCENAR (sizeof(scenarii)/sizeof(scenarii[0]))
 
@@ -286,6 +273,8 @@ void * child(void * arg)
 	return NULL;
 }
 
+// WASI-CHANGE: Let ctest time us out
+#ifndef __wasi__
 /* Timeout thread */
 void * timer(void * arg)
 {
@@ -293,9 +282,10 @@ void * timer(void * arg)
 	unsigned int to = TIMEOUT;
 	do { to = sleep(to); }
 	while (to>0);
-	FAILED_KILLALL("Test failed (hang)", pchildren); 
+	FAILED("Test failed (hang)"); 
 	return NULL; /* For compiler */
 }
+#endif
 
 /* main function */
 
@@ -315,8 +305,6 @@ int main (int argc, char * argv[])
 	pid_t pid;
 	int status;
 	
-	pthread_t t_timer;
-	
 	testdata_t alternativ;
 	
 	output_init();
@@ -325,7 +313,7 @@ int main (int argc, char * argv[])
 	pshared = sysconf(_SC_THREAD_PROCESS_SHARED);
 	cs = sysconf(_SC_CLOCK_SELECTION);
 	monotonic = sysconf(_SC_MONOTONIC_CLOCK);
-	mf =sysconf(_SC_MAPPED_FILES);
+	mf = -1; // WASI-CHANGE force no mmap
 	
 	#if VERBOSE > 0
 	output("Test starting\n");
@@ -363,7 +351,6 @@ int main (int argc, char * argv[])
 	}
 	else
 	{
-		// WASI-CHANGE: We don't support processes, so we don't need to mmap a file
 		#ifdef __wasi__
 		UNRESOLVED(-1, "WASI does not support mmap, which is required for this test");
 		#else
@@ -528,15 +515,15 @@ int main (int argc, char * argv[])
 		
 		/* Make sure all children are waiting */
 		ret = pthread_mutex_lock(&td->mtx1);
-		if (ret != 0) {  UNRESOLVED_KILLALL(ret, "Failed to lock mutex", p_child);  }
+		if (ret != 0) {  UNRESOLVED(ret, "Failed to lock mutex");  }
 		ch = td->count1;
 		while (ch < NTHREADS)
 		{
 			ret = pthread_mutex_unlock(&td->mtx1);
-			if (ret != 0)  {  UNRESOLVED_KILLALL(ret, "Failed to unlock mutex",p_child);  }
+			if (ret != 0)  {  UNRESOLVED(ret, "Failed to unlock mutex");  }
 			sched_yield();
 			ret = pthread_mutex_lock(&td->mtx1);
-			if (ret != 0) {  UNRESOLVED_KILLALL(ret, "Failed to lock mutex",p_child);  }
+			if (ret != 0) {  UNRESOLVED(ret, "Failed to lock mutex");  }
 			ch = td->count1;
 		}
 		
@@ -544,21 +531,17 @@ int main (int argc, char * argv[])
 		output("[parent] All children are waiting\n");
 		#endif
 		
-		/* create the timeout thread */
-		ret = pthread_create(&t_timer, NULL, timer, p_child);
-		if (ret != 0)  {  UNRESOLVED_KILLALL(ret, "Unable to create timer thread",p_child);  }
-		
 		/* Wakeup the children */
 		td->predicate1=1;
 		ret = pthread_cond_broadcast(&td->cnd);
-		if (ret != 0)  {  UNRESOLVED_KILLALL(ret, "Failed to signal the condition.", p_child);  }
+		if (ret != 0)  {  UNRESOLVED(ret, "Failed to signal the condition.");  }
 		
 		ret = pthread_mutex_unlock(&td->mtx1);
-		if (ret != 0)  {  UNRESOLVED_KILLALL(ret, "Failed to unlock mutex",p_child);  }
+		if (ret != 0)  {  UNRESOLVED(ret, "Failed to unlock mutex");  }
 
 		/* Destroy the condvar (this must be safe) */
 		ret = pthread_cond_destroy(&td->cnd);
-		if (ret != 0)  {  FAILED_KILLALL("Unable to destroy the cond while no thread is blocked inside", p_child);  }
+		if (ret != 0)  {  FAILED("Unable to destroy the cond while no thread is blocked inside");  }
 		
 		/* Reuse the cond memory */
 		memset(&td->cnd, 0xFF, sizeof(pthread_cond_t));
@@ -569,20 +552,20 @@ int main (int argc, char * argv[])
 		
 		/* Make sure all children have exited the first wait */
 		ret = pthread_mutex_lock(&td->mtx1);
-		if (ret != 0) {  UNRESOLVED_KILLALL(ret, "Failed to lock mutex",p_child);  }
+		if (ret != 0) {  UNRESOLVED(ret, "Failed to lock mutex");  }
 		ch = td->count1;
 		while (ch > 0)
 		{
 			ret = pthread_mutex_unlock(&td->mtx1);
-			if (ret != 0)  {  UNRESOLVED_KILLALL(ret, "Failed to unlock mutex",p_child);  }
+			if (ret != 0)  {  UNRESOLVED(ret, "Failed to unlock mutex");  }
 			sched_yield();
 			ret = pthread_mutex_lock(&td->mtx1);
-			if (ret != 0) {  UNRESOLVED_KILLALL(ret, "Failed to lock mutex",p_child);  }
+			if (ret != 0) {  UNRESOLVED(ret, "Failed to lock mutex");  }
 			ch = td->count1;
 		}
 
 		ret = pthread_mutex_unlock(&td->mtx1);
-		if (ret != 0)  {  UNRESOLVED_KILLALL(ret, "Failed to unlock mutex",p_child);  }
+		if (ret != 0)  {  UNRESOLVED(ret, "Failed to unlock mutex");  }
 		
 	/* Go toward the 2nd pass */
 		/* Now, all children are waiting to lock the 2nd mutex, which we own here. */
@@ -599,10 +582,10 @@ int main (int argc, char * argv[])
 		while (ch < NTHREADS)
 		{
 			ret = pthread_mutex_unlock(&td->mtx2);
-			if (ret != 0)  {  UNRESOLVED_KILLALL(ret, "Failed to unlock mutex",p_child);  }
+			if (ret != 0)  {  UNRESOLVED(ret, "Failed to unlock mutex");  }
 			sched_yield();
 			ret = pthread_mutex_lock(&td->mtx2);
-			if (ret != 0) {  UNRESOLVED_KILLALL(ret, "Failed to lock mutex",p_child);  }
+			if (ret != 0) {  UNRESOLVED(ret, "Failed to lock mutex");  }
 			ch = td->count2;
 		}
 		
@@ -613,15 +596,15 @@ int main (int argc, char * argv[])
 		/* Wakeup the children */
 		td->predicate2=1;
 		ret = pthread_cond_broadcast(&td->cnd);
-		if (ret != 0)  {  UNRESOLVED_KILLALL(ret, "Failed to signal the condition.", p_child);  }
+		if (ret != 0)  {  UNRESOLVED(ret, "Failed to signal the condition.");  }
 		
 		/* Allow the children to terminate */
 		ret = pthread_mutex_unlock(&td->mtx2);
-		if (ret != 0)  {  UNRESOLVED_KILLALL(ret, "Failed to unlock mutex",p_child);  }
+		if (ret != 0)  {  UNRESOLVED(ret, "Failed to unlock mutex");  }
 
 		/* Destroy the condvar (this must be safe) */
 		ret = pthread_cond_destroy(&td->cnd);
-		if (ret != 0)  {  FAILED_KILLALL("Unable to destroy the cond while no thread is blocked inside", p_child);  }
+		if (ret != 0)  {  FAILED("Unable to destroy the cond while no thread is blocked inside");  }
 		
 		/* Reuse the cond memory */
 		memset(&td->cnd, 0x00, sizeof(pthread_cond_t));
@@ -675,19 +658,6 @@ int main (int argc, char * argv[])
 		#if VERBOSE > 4
 		output("[parent] All children terminated\n");
 		#endif
-		
-		
-		/* cancel the timeout thread */
-		ret = pthread_cancel(t_timer);
-		if (ret != 0)
-		{
-			/* Strange error here... the thread cannot be terminated (app would be killed) */
-			UNRESOLVED(ret, "Failed to cancel the timeout handler");
-		}
-		
-		/* join the timeout thread */
-		ret = pthread_join(t_timer, NULL);
-		if (ret != 0)  {  UNRESOLVED(ret, "Failed to join the timeout handler");  }
 			
 		/* Destroy the datas */
 		ret = pthread_cond_destroy(&td->cnd);

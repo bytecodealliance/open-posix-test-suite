@@ -144,6 +144,7 @@ struct _scenar
 	int fork; /* 0: Test between threads. ~ !0: Test across processes, if supported (mmap) */
 	char * descr; /* Case description */
 }
+
 scenarii[] =
 {
 	 {PTHREAD_MUTEX_DEFAULT,    0, 0, 0, "Default mutex"}
@@ -266,6 +267,8 @@ children_t * children=&sentinel;
 
 sem_t sem_tmr;
 
+// WASI-CHANGE: ctest will handle timeouts for us
+#ifndef __wasi__
 void * timer(void * arg)
 {
 	unsigned int to = TIMEOUT;
@@ -280,6 +283,7 @@ void * timer(void * arg)
 	FAILED("Operation timed out. A signal was lost."); 
 	return NULL; /* For compiler */
 }
+#endif
 
 /* main function */
 
@@ -312,7 +316,7 @@ int main (int argc, char * argv[])
 	pshared = sysconf(_SC_THREAD_PROCESS_SHARED);
 	cs = sysconf(_SC_CLOCK_SELECTION);
 	monotonic = sysconf(_SC_MONOTONIC_CLOCK);
-	mf =sysconf(_SC_MAPPED_FILES);
+	mf = -1; // WASI-CHANGE: force no mmap
 	
 	#if VERBOSE > 0
 	output("Test starting\n");
@@ -428,10 +432,14 @@ int main (int argc, char * argv[])
 		/* Set the pshared attributes, if supported */
 		if ((pshared > 0) && (scenarii[scenar].mc_pshared != 0))
 		{
+			#ifdef __wasi__
+			UNRESOLVED(-1, "Process-shared mutexes and condvars are not supported on WASI, but test is configured to use them");
+			#else
 			ret = pthread_mutexattr_setpshared(&ma, PTHREAD_PROCESS_SHARED);
 			if (ret != 0)  {  UNRESOLVED(ret, "[parent] Unable to set the mutex process-shared");  }
 			ret = pthread_condattr_setpshared(&ca, PTHREAD_PROCESS_SHARED);
 			if (ret != 0)  {  UNRESOLVED(ret, "[parent] Unable to set the cond var process-shared");  }
+			#endif
 		}
 		
 		/* Set the alternative clock, if supported */
@@ -475,10 +483,6 @@ int main (int argc, char * argv[])
 		td->count=0;
 		child_count=0;
 		cur=children;
-		
-		/* create the timeout thread */
-		ret = pthread_create(&t_timer, NULL, timer, NULL);
-		if (ret != 0)  {  UNRESOLVED(ret, "Unable to create timer thread");  }
 		
 		/* Create all the children */
 		if (td->fork==0)
@@ -635,19 +639,6 @@ int main (int argc, char * argv[])
 		output("[parent] All children terminated\n");
 		#endif
 		
-		
-		/* cancel the timeout thread */
-		ret = pthread_cancel(t_timer);
-		if (ret != 0)
-		{
-			/* Strange error here... the thread cannot be terminated (app would be killed) */
-			UNRESOLVED(ret, "Failed to cancel the timeout handler");
-		}
-		
-		/* join the timeout thread */
-		ret = pthread_join(t_timer, NULL);
-		if (ret != 0)  {  UNRESOLVED(ret, "Failed to join the timeout handler");  }
-			
 		/* Destroy the datas */
 		ret = pthread_cond_destroy(&td->cnd);
 		if (ret != 0)  {  UNRESOLVED(ret, "Failed to destroy the condvar");  }

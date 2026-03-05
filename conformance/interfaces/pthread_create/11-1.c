@@ -32,7 +32,11 @@ void *a_thread_func(void* arg)
 	/* Just test the tv_sec field here. */
 	if (ts.tv_sec != 0)
 	{
+		#ifdef __wasi__
+		printf("ts.tv_sec: %lld, ts.tv_nsec: %ld\n", 
+		#else
 		printf("ts.tv_sec: %ld, ts.tv_nsec: %ld\n", 
+		#endif
 			ts.tv_sec, ts.tv_nsec);
 		exit(PTS_FAIL);
 	}
