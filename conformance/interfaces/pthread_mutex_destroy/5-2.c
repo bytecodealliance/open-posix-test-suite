@@ -91,13 +91,10 @@ scenarii[] =
 	,{PTHREAD_MUTEX_ERRORCHECK, 0, "Errorcheck mutex"}
 	,{PTHREAD_MUTEX_RECURSIVE,  0, "Recursive mutex"}
 
-// WASI-CHANGE: Process-shared mutexes are not supported in WASI, so we omit those test cases.
-#ifndef __wasi__
 	,{PTHREAD_MUTEX_DEFAULT,    1, "Pshared mutex"}
 	,{PTHREAD_MUTEX_NORMAL,     1, "Pshared Normal mutex"}
 	,{PTHREAD_MUTEX_ERRORCHECK, 1, "Pshared Errorcheck mutex"}
 	,{PTHREAD_MUTEX_RECURSIVE,  1, "Pshared Recursive mutex"}
-#endif
 };
 #define NSCENAR (sizeof(scenarii)/sizeof(scenarii[0]))
 
