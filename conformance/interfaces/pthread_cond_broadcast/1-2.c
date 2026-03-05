@@ -144,7 +144,7 @@ struct _scenar
 	int fork; /* 0: Test between threads. ~ !0: Test across processes, if supported (mmap) */
 	char * descr; /* Case description */
 }
-// WASI-CHANGE: Process-shared mutexes and condvars are not supported, so we won't test them
+
 scenarii[] =
 {
 	 {PTHREAD_MUTEX_DEFAULT,    0, 0, 0, "Default mutex"}
@@ -152,7 +152,8 @@ scenarii[] =
 	,{PTHREAD_MUTEX_ERRORCHECK, 0, 0, 0, "Errorcheck mutex"}
 	,{PTHREAD_MUTEX_RECURSIVE,  0, 0, 0, "Recursive mutex"}
 
-#ifndef __wasi__
+	// WASI-CHANGE: We don't support processes, so don't need these
+	#ifndef __wasi__
 	,{PTHREAD_MUTEX_DEFAULT,    1, 0, 0, "PShared default mutex"}
 	,{PTHREAD_MUTEX_NORMAL,     1, 0, 0, "Pshared normal mutex"}
 	,{PTHREAD_MUTEX_ERRORCHECK, 1, 0, 0, "Pshared errorcheck mutex"}
@@ -162,27 +163,27 @@ scenarii[] =
 	,{PTHREAD_MUTEX_NORMAL,     1, 0, 1, "Pshared normal mutex across processes"}
 	,{PTHREAD_MUTEX_ERRORCHECK, 1, 0, 1, "Pshared errorcheck mutex across processes"}
 	,{PTHREAD_MUTEX_RECURSIVE,  1, 0, 1, "Pshared recursive mutex across processes"}
-#endif
+	#endif
 
 #ifdef USE_ALTCLK
-#ifndef __wasi__
+	#ifndef __wasi__
 	,{PTHREAD_MUTEX_DEFAULT,    1, 1, 1, "Pshared default mutex and alt clock condvar across processes"}
 	,{PTHREAD_MUTEX_NORMAL,     1, 1, 1, "Pshared normal mutex and alt clock condvar across processes"}
 	,{PTHREAD_MUTEX_ERRORCHECK, 1, 1, 1, "Pshared errorcheck mutex and alt clock condvar across processes"}
 	,{PTHREAD_MUTEX_RECURSIVE,  1, 1, 1, "Pshared recursive mutex and alt clock condvar across processes"}
-#endif
+	#endif
 
 	,{PTHREAD_MUTEX_DEFAULT,    0, 1, 0, "Default mutex and alt clock condvar"}
 	,{PTHREAD_MUTEX_NORMAL,     0, 1, 0, "Normal mutex and alt clock condvar"}
 	,{PTHREAD_MUTEX_ERRORCHECK, 0, 1, 0, "Errorcheck mutex and alt clock condvar"}
 	,{PTHREAD_MUTEX_RECURSIVE,  0, 1, 0, "Recursive mutex and alt clock condvar"}
 
-#ifndef __wasi__
+	#ifndef __wasi__
 	,{PTHREAD_MUTEX_DEFAULT,    1, 1, 0, "PShared default mutex and alt clock condvar"}
 	,{PTHREAD_MUTEX_NORMAL,     1, 1, 0, "Pshared normal mutex and alt clock condvar"}
 	,{PTHREAD_MUTEX_ERRORCHECK, 1, 1, 0, "Pshared errorcheck mutex and alt clock condvar"}
 	,{PTHREAD_MUTEX_RECURSIVE,  1, 1, 0, "Pshared recursive mutex and alt clock condvar"}
-#endif
+	#endif
 #endif
 };
 #define NSCENAR (sizeof(scenarii)/sizeof(scenarii[0]))
@@ -354,7 +355,7 @@ int main (int argc, char * argv[])
 	else
 	{
 		#ifdef __wasi__
-		UNRESOLVED(-1, "mmap is not supported on WASI, but test is configured to use it");
+		UNRESOLVED(-1, "WASI does not support memory mapping, which is required for this test");
 		#else
 		/* We will place the test data in a mmaped file */
 		char filename[] = "/tmp/cond_broadcast-XXXXXX";
@@ -399,7 +400,7 @@ int main (int argc, char * argv[])
 		#if VERBOSE > 1
 		output("Testdata allocated in shared memory (%ib).\n", sizeof(testdata_t));
 		#endif
-		 #endif
+		#endif
 	}
 	
 	/* Initialize the thread attribute object */
@@ -518,7 +519,7 @@ int main (int argc, char * argv[])
 		else
 		{
 			#ifdef __wasi__
-			UNRESOLVED(-1, "Process creation is not supported on WASI, but test is configured to use it");
+			UNRESOLVED(-1, "WASI does not support forking, which is required for this test");
 			#else
 			do
 			{
@@ -555,7 +556,7 @@ int main (int argc, char * argv[])
 			#endif
 			if (child_count==0)
 			{  UNRESOLVED(ret, "Unable to create any process");  }
-			 #endif
+			#endif
 		}
 		
 		/* Make sure all children are waiting */
@@ -617,7 +618,6 @@ int main (int argc, char * argv[])
 					ret = errno;
 					output("Waitpid failed (expected: %i, got: %i)\n", tmp->data.p, pid);
 					free(tmp);
-					UNRESOLVED(ret, "Waitpid failed");
 					UNRESOLVED(ret, "Waitpid failed");
 				}
 				if (WIFEXITED(status))
