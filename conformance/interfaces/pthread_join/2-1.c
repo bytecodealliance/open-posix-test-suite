@@ -36,8 +36,7 @@ void *a_thread_func(void* arg)
 {
 	(void)arg;
 	sem=INMAIN;
-	pthread_exit(RETURN_CODE);
-	return NULL;
+	return RETURN_CODE;
 }
 
 int main()
