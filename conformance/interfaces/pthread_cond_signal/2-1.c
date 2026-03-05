@@ -17,7 +17,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
-#include <signal.h>
 #include "posixtest.h"
 
 #define THREAD_NUM  3
@@ -33,6 +32,8 @@ pthread_t  thread[THREAD_NUM];
 int start_num = 0;
 int waken_num = 0;
 
+// WASI-CHANGE: We will just timeout through ctest, so we don't need to create a timer thread
+#ifndef __wasi__
 /* Alarm handler */
 void alarm_handler(int signo)
 {
@@ -44,6 +45,7 @@ void alarm_handler(int signo)
 
 	exit(PTS_UNRESOLVED);
 }
+#endif
 void *thr_func(void *arg)
 {
 	int rc;
@@ -89,7 +91,6 @@ void *thr_func(void *arg)
 int main()
 {
 	int i;
-	struct sigaction act;
 	pthread_mutexattr_t ma;
 	
 	if (pthread_mutexattr_init(&ma) != 0) {
@@ -121,12 +122,15 @@ int main()
 
 	sleep(1);
 	
+	// WASI-CHANGE: We will just timeout through ctest, so we don't need to create a timer thread
+	#ifndef __wasi__
 	/* Setup alarm handler */
 	act.sa_handler=alarm_handler;
 	act.sa_flags=0;
 	sigemptyset(&act.sa_mask);
 	sigaction(SIGALRM, &act, 0);
 	alarm(5);
+	#endif
 
 	while (waken_num < THREAD_NUM) { /* waiting for all threads wakened */
 		fprintf(stderr,"[Main thread] signals a condition\n");

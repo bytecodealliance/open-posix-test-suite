@@ -48,8 +48,6 @@
  #include <signal.h>
  #include <string.h>
  #include <time.h>
- #include <sys/mman.h>
- #include <sys/wait.h>
  
 /********************************************************************************************/
 /******************************   Test framework   *****************************************/
@@ -73,6 +71,8 @@
   * 
   * Those may be used to output information.
   */
+// WASI-CHANGE: We don't support forking, so don't need these
+#ifndef __wasi__
 #define UNRESOLVED_KILLALL(error, text) { \
 	if (td->fork) \
 	{ \
@@ -91,6 +91,7 @@
 	} \
 	FAILED(text); \
 	}
+#endif
 /********************************************************************************************/
 /********************************** Configuration ******************************************/
 /********************************************************************************************/
@@ -332,6 +333,10 @@ int main (int argc, char * argv[])
 	}
 	else
 	{
+		// WASI-CHANGE: No mmap support
+		#ifdef __wasi__
+		UNRESOLVED(-1, "WASI does not support memory mapping, which is required for this test");
+		#else
 		/* We will place the test data in a mmaped file */
 		char filename[] = "/tmp/cond_broadcast-XXXXXX";
 		size_t sz, ps;
@@ -374,6 +379,7 @@ int main (int argc, char * argv[])
 		/* Our datatest structure is now in shared memory */
 		#if VERBOSE > 1
 		output("Testdata allocated in shared memory (%ib).\n", sizeof(testdata_t));
+		#endif
 		#endif
 	}
 	
@@ -461,6 +467,9 @@ int main (int argc, char * argv[])
 			}
 			else
 			{
+				#ifdef __wasi__
+				UNRESOLVED(-1, "WASI does not support forking, which is required for this test");
+				#else
 				children.ch[children.nb].p=fork();
 				if (children.ch[children.nb].p == 0) /* We are the child */
 				{
@@ -472,6 +481,7 @@ int main (int argc, char * argv[])
 					children.nb--;
 					UNRESOLVED_KILLALL(errno, "Failed to create enough processes");
 				}
+				#endif
 			}
 		}
 		#if VERBOSE > 4
@@ -526,6 +536,9 @@ int main (int argc, char * argv[])
 			}
 			else
 			{
+				#ifdef __wasi__
+				UNRESOLVED(-1, "WASI does not support forking, which is required for this test");
+				#else
 				pid = waitpid(children.ch[children.nb].p, &status, 0);
 				if (pid != children.ch[children.nb].p)
 				{
@@ -539,6 +552,7 @@ int main (int argc, char * argv[])
 					if (ret != PTS_FAIL)
 						ret |= WEXITSTATUS(status);
 				}
+				#endif
 			}
 		}
 		if (ret != 0)

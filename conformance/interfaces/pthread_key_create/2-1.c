@@ -26,7 +26,7 @@
 
 int main()
 {
-	pthread_key_t key;
+	pthread_key_t key = 0;
 	void* rc;
 
 	/* Verify that the value associated with "key" in a new thread is NULL */

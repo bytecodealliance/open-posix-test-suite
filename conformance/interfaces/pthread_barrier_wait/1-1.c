@@ -23,7 +23,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
-#include <signal.h>
 #include <string.h>
 #include "posixtest.h"
 
@@ -55,18 +54,25 @@ static void* fn_chld(void *arg)
 	return NULL;
 }
 
+// WASI-CHANGE: Instead of sending a SIGALRM, we'll just timeout in ctest 
+// if the main thread blocks.
+#ifndef __wasi__
 void sig_handler()
 {
 	printf("Interrupted by SIGALRM\n");
 	printf("Test FAILED: main blocked on barrier wait\n");
 	exit(PTS_FAIL);
 }
+#endif
  
 int main()
 {
 	int cnt = 0;
 	int rc;
 	pthread_t child_thread;
+
+	// WASI-CHANGE: No SIGALRM
+	#ifndef __wasi__
 	struct sigaction act;	
 
 	/* Set up main thread to handle SIGALRM */
@@ -74,6 +80,7 @@ int main()
 	act.sa_handler = sig_handler;
 	sigfillset(&act.sa_mask);
 	sigaction(SIGALRM, &act, 0);
+	#endif
 	
 	printf("Initialize barrier with count = 2\n");
 	if(pthread_barrier_init(&barrier, NULL, 2) != 0)
@@ -110,9 +117,6 @@ int main()
 	}
 
 	printf("main: call barrier wait\n");
-	
-	/* we should not block here, but just in case we do */
-	alarm(2);
 
 	rc = pthread_barrier_wait(&barrier);
 	

@@ -48,10 +48,11 @@ void *a_thread_func(void* arg)
 	if(pthread_setspecific(key, (void *)(KEY_VALUE)) != 0)
 	{
 		printf("Error: pthread_setspecific() failed\n");
-		pthread_exit((void*) PTS_UNRESOLVED);
+		return (void*) PTS_UNRESOLVED;
 	}
 	
 	/* The thread ends here, the destructor for the key should now be called after this */
+	return (void*) PTS_PASS;
 }
 
 int main()
@@ -65,7 +66,7 @@ int main()
 	if(pthread_key_create(&key, dest_func) != 0)
 	{
 		printf("Error: pthread_key_create() failed\n");
-		pthread_exit((void*) PTS_UNRESOLVED);
+		return PTS_UNRESOLVED;
 	}
 
 	/* Create a thread */
@@ -76,10 +77,17 @@ int main()
 	}
 
 	/* Wait for the thread's return */
-	if(pthread_join(new_th, NULL) != 0)
+	void* thread_ret;
+	if(pthread_join(new_th, &thread_ret) != 0)
 	{
 		perror("Error in pthread_join()\n");
 		return PTS_UNRESOLVED;
+	}
+
+	if (thread_ret != (void*)PTS_PASS)
+	{
+		printf("Test FAILED: Thread did not return PTS_PASS\n");
+		return PTS_FAIL;
 	}
 
 	/* Check if the destructor was called and if the pthread_key_delete function was

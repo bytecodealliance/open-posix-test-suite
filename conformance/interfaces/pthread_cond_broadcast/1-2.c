@@ -72,7 +72,8 @@
   * 
   * Those may be used to output information.
   */
-// WASI-CHANGE: We won't fork, so don't need these
+
+// WASI-CHANGE: We don't support forking, so don't need these
 #ifndef __wasi__
 #define UNRESOLVED_KILLALL(error, text) { \
 	if (td->fork) \
@@ -103,6 +104,7 @@
 	FAILED(text); \
 	}
 #endif
+
 /********************************************************************************************/
 /********************************** Configuration ******************************************/
 /********************************************************************************************/
@@ -607,7 +609,7 @@ int main (int argc, char * argv[])
 			else
 			{
 				#ifdef __wasi__
-				UNRESOLVED(-1, "Process creation is not supported on WASI, but test is configured to use it");
+				UNRESOLVED(-1, "WASI does not support forking, which is required for this test");
 				#else
 				pid = waitpid(tmp->data.p, &status, 0);
 				if (pid != tmp->data.p)
@@ -615,6 +617,7 @@ int main (int argc, char * argv[])
 					ret = errno;
 					output("Waitpid failed (expected: %i, got: %i)\n", tmp->data.p, pid);
 					free(tmp);
+					UNRESOLVED(ret, "Waitpid failed");
 					UNRESOLVED(ret, "Waitpid failed");
 				}
 				if (WIFEXITED(status))

@@ -157,12 +157,14 @@ scenarii[] =
 	,{PTHREAD_MUTEX_ERRORCHECK, 1, 1, 1, "Pshared errorcheck mutex and alt clock condvar across processes"}
 	,{PTHREAD_MUTEX_RECURSIVE,  1, 1, 1, "Pshared recursive mutex and alt clock condvar across processes"}
 #endif
+#endif
 
 	,{PTHREAD_MUTEX_DEFAULT,    0, 1, 0, "Default mutex and alt clock condvar"}
 	,{PTHREAD_MUTEX_NORMAL,     0, 1, 0, "Normal mutex and alt clock condvar"}
 	,{PTHREAD_MUTEX_ERRORCHECK, 0, 1, 0, "Errorcheck mutex and alt clock condvar"}
 	,{PTHREAD_MUTEX_RECURSIVE,  0, 1, 0, "Recursive mutex and alt clock condvar"}
 
+#ifndef __wasi__
 #ifndef __wasi__
 	,{PTHREAD_MUTEX_DEFAULT,    1, 1, 0, "PShared default mutex and alt clock condvar"}
 	,{PTHREAD_MUTEX_NORMAL,     1, 1, 0, "Pshared normal mutex and alt clock condvar"}
@@ -427,6 +429,7 @@ int main (int argc, char * argv[])
 			ret = pthread_condattr_setpshared(&ca, PTHREAD_PROCESS_SHARED);
 			if (ret != 0)  {  UNRESOLVED(ret, "[parent] Unable to set the cond var process-shared");  }
 			#endif
+			#endif
 		}
 		
 		/* Set the alternative clock, if supported */
@@ -445,7 +448,12 @@ int main (int argc, char * argv[])
 		/* Tell whether the test will be across processes */
 		if ((pshared > 0) && (scenarii[scenar].fork != 0))
 		{
+			#ifdef __wasi__
+			UNRESOLVED(-1, "WASI does not support process-shared synchronization primitives, which are required for
+				 this test scenario");
+			#else
 			td->fork = 1;
+			#endif
 		}
 		
 		
