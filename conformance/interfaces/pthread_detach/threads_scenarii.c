@@ -189,7 +189,7 @@ void scenar_init()
 		if (tps>0) /* This routine is dependent on the Thread Execution Scheduling option */
 		{
 			#ifdef __wasi__
-			FAILED("Scheduling policies are not supported on WASI");
+			UNRESOLVED(-1, "Scheduling policies are not supported on WASI");
 			#else
 			if (scenarii[i].explicitsched == 1)
 				ret = pthread_attr_setinheritsched(&scenarii[i].ta, PTHREAD_EXPLICIT_SCHED);
@@ -209,7 +209,7 @@ void scenar_init()
 		if (tps>0) /* This routine is dependent on the Thread Execution Scheduling option */
 		{
 			#ifdef __wasi__
-			FAILED("Scheduling policies are not supported on WASI");
+			UNRESOLVED(-1, "Scheduling policies are not supported on WASI");
 			#else
 			if (scenarii[i].schedpolicy == 1)
 			{
@@ -236,7 +236,7 @@ void scenar_init()
 		if (scenarii[i].schedparam != 0)
 		{
 			#ifdef __wasi__
-			FAILED("Scheduling policies are not supported on WASI");
+			UNRESOLVED(-1, "Scheduling policies are not supported on WASI");
 			#else
 			struct sched_param sp;
 			
@@ -266,7 +266,7 @@ void scenar_init()
 		if (tps>0) /* This routine is dependent on the Thread Execution Scheduling option */
 		{
 			#ifdef __wasi__
-			FAILED("Scheduling policies are not supported on WASI");
+			UNRESOLVED(-1, "Scheduling policies are not supported on WASI");
 			#else
 			ret = pthread_attr_getscope(&scenarii[i].ta, &old);
 			if (ret != 0)  {  UNRESOLVED(ret, "Failed to get contension scope from thread attribute");  }
@@ -326,7 +326,7 @@ void scenar_init()
 		if (scenarii[i].guard != 0)
 		{
 			#ifdef __wasi__
-			FAILED("Stack guards are not supported on WASI");
+			UNRESOLVED(-1, "Stack guards are not supported on WASI");
 			#else
 			if (scenarii[i].guard == 1)
 				ret = pthread_attr_setguardsize(&scenarii[i].ta, 0);
