@@ -25,9 +25,18 @@
 #include <unistd.h>
 #include "posixtest.h"
 
+int ready_to_exit = 0;
 
 void *a_thread_func(void* arg)
 {
+	// WASI-CHANGE: Rather than cancelling, we'll wait on a bool
+	#ifdef __wasi__
+	while (!ready_to_exit)
+	{
+		sched_yield();
+	}
+	return NULL;
+	#else
 	(void)arg;
 	pthread_setcanceltype(PTHREAD_CANCEL_ASYNCHRONOUS, NULL);
 
@@ -36,6 +45,7 @@ void *a_thread_func(void* arg)
 
 	perror("Thread couldn't be canceled (at cleanup time), timing out\n");
 	return NULL;
+	#endif
 }
 
 int main()
@@ -75,8 +85,14 @@ int main()
 	/* Now try and join it.  This should fail. */
 	ret=pthread_join(new_th, NULL);
 	
+	// WASI-CHANGE: Instead of cancelling, we'll set a bool to let the thread know it can exit
+	#ifdef __wasi__
+	ready_to_exit = 1;
+	sched_yield();
+	#else
 	/* Cleanup: Cancel the thread */
 	pthread_cancel(new_th);
+	#endif
 	
 	if(ret == 0)
 	{
