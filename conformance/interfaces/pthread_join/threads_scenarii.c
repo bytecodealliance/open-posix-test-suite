@@ -247,16 +247,17 @@ void scenar_init()
 			{
 				UNRESOLVED( ret, "Failed to set the sched param" );
 			}
-			#endif
-#if VERBOSE > 4
+			#if VERBOSE > 4
 			output( "Sched param was set sucessfully to %i\n", sp.sched_priority );
+			#endif
+			#endif
 		}
+		#if VERBOSE > 4
 		else
 		{
 			output( "Sched param untouched\n" );
-#endif
-
 		}
+		#endif
 
 		if ( tps > 0 )     /* This routine is dependent on the Thread Execution Scheduling option */
 		{
@@ -344,7 +345,7 @@ void scenar_init()
 		if ( scenarii[ i ].guard != 0 )
 		{
 			#ifdef __wasi__
-			FAILED( "Stack guards are not supported on WASI" );
+			UNRESOLVED(-1, ( "Stack guards are not supported on WASI" );
 			#else
 			if ( scenarii[ i ].guard == 1 )
 				ret = pthread_attr_setguardsize( &scenarii[ i ].ta, 0 );
