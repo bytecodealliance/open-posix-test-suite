@@ -132,7 +132,7 @@ struct __scenario
 void scenar_init()
 {
 	int ret=0;
-	int i;
+	size_t i;
 	int old;
 	long pagesize, minstacksize;
 	long tsa, tss, tps;
@@ -368,7 +368,8 @@ void scenar_init()
 /* This function will free all resources consumed in the scenar_init() routine */
 void scenar_fini(void)
 {
-	int ret = 0, i;
+	int ret = 0;
+	size_t i;
 	
 	for (i=0; i<NSCENAR; i++)
 	{
@@ -383,7 +384,7 @@ void scenar_fini(void)
 	}
 }
 
-int sc=0; /* This might be very dirty... but is much simpler */
+size_t sc=0; /* This might be very dirty... but is much simpler */
 
 #ifdef STD_MAIN /* We want main to be defined here */
 

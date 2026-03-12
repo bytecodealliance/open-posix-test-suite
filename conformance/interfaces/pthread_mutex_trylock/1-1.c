@@ -85,6 +85,7 @@ int main()
 
 void *func(void *parm)
 {
+	(void)parm;
   	int rc;
 
 	if((rc=pthread_mutex_lock(&mutex))!=0) {

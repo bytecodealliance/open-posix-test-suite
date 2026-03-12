@@ -48,6 +48,7 @@ void alarm_handler(int signo)
 #endif
 void *thr_func(void *arg)
 {
+	(void)arg;
 	int rc;
 	pthread_t self = pthread_self();
 	

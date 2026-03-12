@@ -34,6 +34,7 @@ static int thread_state;
 
 static void* fn_chld(void *arg)
 { 
+	(void)arg;
 	int rc = 0;
 	thread_state = ENTERED_THREAD;
 	

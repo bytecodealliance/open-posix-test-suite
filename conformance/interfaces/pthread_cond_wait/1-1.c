@@ -42,6 +42,7 @@ void alarm_handler(int signo)
 
 void *t1_func(void *arg)
 {
+	(void)arg;
 	int rc;
 	
 	if (pthread_mutex_lock(&td.mutex) != 0) {

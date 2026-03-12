@@ -120,7 +120,7 @@ void * threaded ( void * arg )
 }
 
 /* The main test function. */
-int main( int argc, char * argv[] )
+int main()
 {
 	int ret, i;
 

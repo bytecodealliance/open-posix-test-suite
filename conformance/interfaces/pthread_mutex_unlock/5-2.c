@@ -85,7 +85,7 @@
 
 
 /** parent thread function **/
-int main(int argc, char * argv[])
+int main()
 {
 	int ret;
 	pthread_mutexattr_t ma;

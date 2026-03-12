@@ -32,6 +32,7 @@ int dest_cnt;
 /* Destructor funciton */
 void dest_func(void *p)
 {
+	(void)p;
 	dest_cnt++;
 	/* Delete the key and check if an error has occured */
 	if(pthread_key_delete(key) != 0)

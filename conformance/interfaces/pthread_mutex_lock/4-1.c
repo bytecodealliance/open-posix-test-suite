@@ -101,6 +101,7 @@ sem_t  sem;
 /** child thread function **/
 void * threaded(void * arg)
 {
+	(void)arg;
 	int ret;
 	/* Try to lock the mutex once. The call must fail here. */
 	ret = pthread_mutex_trylock(&mtx);
@@ -136,7 +137,7 @@ void * threaded(void * arg)
 }
 
 /** parent thread function **/
-int main(int argc, char * argv[])
+int main()
 {
 	int ret;
 	int i;
