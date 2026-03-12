@@ -42,7 +42,7 @@ void *a_thread_func(void* arg)
 	(void)arg;
 	/* Try to unlock the mutex that main already locked. */
 	ret=pthread_mutex_unlock(&mutex);
-	pthread_exit((void*)0);
+	return NULL;
 }
 
 

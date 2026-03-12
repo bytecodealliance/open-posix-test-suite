@@ -34,6 +34,7 @@ int dest_cnt;
 /* Destructor funciton */
 void dest_func(void *p)
 {
+	(void)p;
 	dest_cnt++;
 }
 

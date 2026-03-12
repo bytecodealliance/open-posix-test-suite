@@ -235,9 +235,10 @@ void * tf(void * arg)
 }
 
 
-int main(int argc, char * argv[])
+int main()
 {
-	int ret, i;
+	int ret;
+	size_t i;
 	pthread_mutexattr_t ma;
 	pthread_condattr_t ca;
 	
@@ -245,9 +246,6 @@ int main(int argc, char * argv[])
 	testdata_t alternativ;
 	
 	int do_fork;
-	
-	pid_t child_pr=0, chkpid;
-	int status;
 	pthread_t child_th;
 	
 	long pshared, monotonic, cs, mf;

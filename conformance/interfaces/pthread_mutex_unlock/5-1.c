@@ -89,6 +89,7 @@ pthread_mutex_t m;
 /** child thread function **/
 void * threaded(void * arg)
 {
+	(void)arg;
 	int ret;
 	ret = pthread_mutex_unlock(&m);
 	if (ret == 0)
@@ -101,7 +102,7 @@ void * threaded(void * arg)
 }
 
 /** parent thread function **/
-int main(int argc, char * argv[])
+int main()
 {
 	int ret;
 	pthread_mutexattr_t ma;

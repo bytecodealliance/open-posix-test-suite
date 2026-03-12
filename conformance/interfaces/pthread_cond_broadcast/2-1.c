@@ -32,6 +32,7 @@ int waken_num = 0;
 
 void *thr_func(void *arg)
 {
+	(void)arg;
 	int rc;
 	pthread_t self = pthread_self();
 	

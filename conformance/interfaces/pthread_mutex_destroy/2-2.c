@@ -99,10 +99,10 @@ scenarii[] =
 
 
 /* Main function */
-int main (int argc, char * argv[])
+int main ()
 {
 	int ret;
-	int i,j;
+	size_t i,j;
 	pthread_mutex_t mtx;
 	pthread_mutexattr_t ma[NSCENAR + 1];
 	pthread_mutexattr_t *pma[NSCENAR + 2];

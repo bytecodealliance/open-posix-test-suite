@@ -46,8 +46,6 @@
  #include <unistd.h>
 
  #include <errno.h>
- #include <sys/wait.h>
- #include <sys/mman.h>
  #include <string.h>
  
 /********************************************************************************************/
@@ -105,6 +103,8 @@ scenarii[] =
 	,{PTHREAD_MUTEX_RECURSIVE,  0, 0, "Recursive mutex"}
 #endif
 
+// WASI-CHANGE: We don't support process-shared mutexes, so we won't test them
+#ifndef __wasi__
 	,{PTHREAD_MUTEX_DEFAULT,    1, 0, "Pshared mutex"}
 #ifndef WITHOUT_XOPEN
 	,{PTHREAD_MUTEX_NORMAL,     1, 0, "Pshared Normal mutex"}
@@ -117,6 +117,7 @@ scenarii[] =
 	,{PTHREAD_MUTEX_NORMAL,     1, 1, "Pshared Normal mutex across processes"}
 	,{PTHREAD_MUTEX_ERRORCHECK, 1, 1, "Pshared Errorcheck mutex across processes"}
 	,{PTHREAD_MUTEX_RECURSIVE,  1, 1, "Pshared Recursive mutex across processes"}
+#endif
 #endif
 };
 #define NSCENAR (sizeof(scenarii)/sizeof(scenarii[0]))
@@ -140,10 +141,10 @@ void * tf(void * arg)
 }
 
 /* Main entry point. */
-int main(int argc, char * argv[])
+int main()
 {
 	int ret;
-	int sc;
+	size_t sc;
 	pthread_mutexattr_t ma;
 	
 	testdata_t * td;
@@ -151,8 +152,6 @@ int main(int argc, char * argv[])
 	
 	int do_fork;
 	
-	pid_t child_pr=0, chkpid;
-	int status;
 	pthread_t child_th;
 	
 	long pshared, mf;
@@ -160,12 +159,9 @@ int main(int argc, char * argv[])
 	/* Initialize output */
 	output_init();
 	
-	/* Initialize the timeout */
-	alarm(30);
-	
 	/* Test system abilities */
 	pshared = sysconf(_SC_THREAD_PROCESS_SHARED);
-	mf =sysconf(_SC_MAPPED_FILES);
+	mf = -1; // WASI-CHANGE: Force no mmap
 	
 	#if VERBOSE > 0
 	output("Test starting\n");
@@ -198,6 +194,9 @@ int main(int argc, char * argv[])
 	#ifndef WITHOUT_XOPEN
 	else
 	{
+		#ifdef __wasi__
+		UNRESOLVED(-1, "Process creation is not supported on WASI");
+		#else
 		/* We will place the test data in a mmaped file */
 		char filename[] = "/tmp/mutex_trylock_4-2-XXXXXX";
 		size_t sz;
@@ -240,6 +239,7 @@ int main(int argc, char * argv[])
 		#if VERBOSE > 1
 		output("Testdata allocated in shared memory.\n");
 		#endif
+		#endif
 	}
 	#endif
 	
@@ -269,10 +269,14 @@ int main(int argc, char * argv[])
 		/* Set the pshared attributes, if supported */
 		if ((pshared > 0) && (scenarii[sc].m_pshared != 0))
 		{
+			#ifdef __wasi__
+			UNRESOLVED(-1, "Process-shared mutexes are not supported on WASI");
+			#else
 			ret = pthread_mutexattr_setpshared(&ma, PTHREAD_PROCESS_SHARED);
 			if (ret != 0)  {  UNRESOLVED(ret, "[parent] Unable to set the mutex process-shared");  }
 			#if VERBOSE > 1
 			output("[parent] Mutex is process-shared\n");
+			#endif
 			#endif
 		}
 		#if VERBOSE > 1
@@ -316,6 +320,9 @@ int main(int argc, char * argv[])
 		/* Create the children */
 		if (do_fork != 0)
 		{
+			#ifdef __wasi__
+			UNRESOLVED(-1, "Process creation is not supported on WASI");
+			#else
 			/* We are testing across processes */
 			child_pr = fork();
 			if (child_pr == -1)
@@ -338,6 +345,7 @@ int main(int argc, char * argv[])
 				}
 			}
 			/* Only the parent process goes further */
+			#endif
 		}
 		else /* do_fork == 0 */
 		{
@@ -349,6 +357,9 @@ int main(int argc, char * argv[])
 		/* Wait for the child to terminate */
 		if (do_fork != 0)
 		{
+			#ifdef __wasi__
+			UNRESOLVED(-1, "Process creation is not supported on WASI");
+			#else
 			/* We were testing across processes */
 			ret = 0;
 			chkpid = waitpid(child_pr, &status, 0);
@@ -376,7 +387,7 @@ int main(int argc, char * argv[])
 			{
 				exit(ret); /* Output has already been closed in child */
 			}
-	
+			#endif
 		}
 		else /* child was a thread */
 		{

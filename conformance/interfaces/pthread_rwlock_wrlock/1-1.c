@@ -44,7 +44,7 @@ static int thread_state;
 
 static void* fn_wr(void *arg)
 { 
-	
+	(void)arg;
 	thread_state = ENTERED_THREAD;
 	int rc;
 

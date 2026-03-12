@@ -29,6 +29,7 @@ int ready_to_exit = 0;
 
 void *a_thread_func(void* arg)
 {
+	(void)arg;
 	// WASI-CHANGE: Rather than cancelling, we'll wait on a bool
 	#ifdef __wasi__
 	while (!ready_to_exit)
@@ -37,7 +38,6 @@ void *a_thread_func(void* arg)
 	}
 	return NULL;
 	#else
-	(void)arg;
 	pthread_setcanceltype(PTHREAD_CANCEL_ASYNCHRONOUS, NULL);
 
 	/* If the thread wasn't canceled in 10 seconds, time out */

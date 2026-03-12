@@ -35,6 +35,7 @@ pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
 
 void * thread(void *tmp)
 {	
+	(void)tmp;
 	int    rc = 0;
 
 	/* acquire the mutex */

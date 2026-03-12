@@ -57,7 +57,6 @@ int main()
 {
 	pthread_attr_t new_attr;
 	pthread_t new_th;
-	int ret;
 
 	/* Initialize attribute */
 	if(pthread_attr_init(&new_attr) != 0)
