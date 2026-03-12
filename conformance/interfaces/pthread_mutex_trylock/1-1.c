@@ -72,7 +72,12 @@ int main()
 	}
 		
 	/* Clean up */
-	pthread_join(t1, NULL);
+	int ret;
+	pthread_join(t1, (void**)&ret);
+	if (ret != 0) {
+		fprintf(stderr,"Secondary thread returned with error code %d\n", ret);
+		return PTS_UNRESOLVED;
+	}
   	pthread_mutex_destroy(&mutex);
 
 	if(i>=5) {
@@ -90,7 +95,7 @@ void *func(void *parm)
 
 	if((rc=pthread_mutex_lock(&mutex))!=0) {
 		fprintf(stderr,"Error at pthread_mutex_lock(), rc=%d\n",rc);
-		pthread_exit((void*)PTS_UNRESOLVED);
+		return (void*)PTS_UNRESOLVED;
 	}
 	t1_start=1;
 	
@@ -99,7 +104,7 @@ void *func(void *parm)
 
 	if((rc=pthread_mutex_unlock(&mutex))!=0) {
 		fprintf(stderr,"Error at pthread_mutex_unlock(), rc=%d\n",rc);
-		pthread_exit((void*)PTS_UNRESOLVED);
+		return (void*)PTS_UNRESOLVED;
 	}
 
   	return (void*)(0);
